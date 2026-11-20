@@ -1,0 +1,26 @@
+{
+  "name": "kacean-admin",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "dev:shell": "pnpm --filter shell dev",
+    "build:shell": "pnpm --filter shell build",
+    "dev:module": "pnpm --filter",
+    "build:module": "pnpm --filter",
+    "lint": "eslint . --ext .js,.cjs,.mjs,.ts,.tsx,.vue --no-error-on-unmatched-pattern",
+    "format": "prettier --write ."
+  },
+  "keywords": [],
+  "author": "kacean",
+  "license": "ISC",
+  "packageManager": "pnpm@10.34.9",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^8.73.0",
+    "@typescript-eslint/parser": "^8.73.0",
+    "eslint": "^8.57.1",
+    "eslint-plugin-vue": "^10.12.1",
+    "prettier": "^3.10.1",
+    "typescript": "^5.9.3",
+    "vue-eslint-parser": "^10.4.2"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "name": "shell",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@kacean/common": "workspace:*",
+    "@kacean/shared": "workspace:*",
+    "@kacean/types": "workspace:*",
+    "vue": "^3.5.13"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.1",
+    "vite": "^5.4.11"
+  }
+}
