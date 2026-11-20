@@ -6,8 +6,8 @@ import Settings from './views/Settings'
 export const shellManifest: AdminModuleManifest = {
   name: 'shell',
   menus: [
-    { path: '/dashboard', title: '工作台', order: 0 },
-    { path: '/settings', title: '系统设置', order: 100 }
+    { path: '/dashboard', title: '工作台', icon: 'dashboard', order: 0 },
+    { path: '/settings', title: '系统设置', icon: 'setting', order: 100 }
   ],
   routes: [
     { path: '/dashboard', component: Dashboard },

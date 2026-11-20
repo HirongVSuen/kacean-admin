@@ -7,8 +7,10 @@ export default defineComponent({
   setup() {
     return () => (
       <div>
-        <PageHeader title="系统设置" />
-        <Card bordered>系统设置页面占位，后续由 shell 或业务模块补充。</Card>
+        <PageHeader title="系统设置" description="管理平台偏好与通用配置。" />
+        <Card title="通用设置" bordered>
+          <p class="m-0 text-secondary">配置能力将在后续版本中提供，当前页面用于展示统一的页面布局。</p>
+        </Card>
       </div>
     )
   }

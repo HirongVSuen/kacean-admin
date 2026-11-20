@@ -5,6 +5,23 @@ import DemoList from './views/List'
 export const manifest: AdminModuleManifest = {
   name: 'demo-module',
   permissions: ['demo-module:list'],
-  menus: [{ path: '/demo-module/list', title: '示例模块', icon: 'app', order: 10, permission: 'demo-module:list' }],
+  menus: [
+    {
+      path: '/demo-module',
+      title: '示例模块',
+      icon: 'app',
+      order: 10,
+      permission: 'demo-module:list',
+      children: [
+        {
+          path: '/demo-module/list',
+          title: '列表示例',
+          icon: 'list',
+          order: 0,
+          permission: 'demo-module:list'
+        }
+      ]
+    }
+  ],
   routes: [{ path: '/demo-module/list', component: DemoList }]
 }
