@@ -5,8 +5,8 @@
   "scripts": {
     "dev:shell": "pnpm --filter shell dev",
     "build:shell": "pnpm --filter shell build",
-    "dev:module": "pnpm --filter",
-    "build:module": "pnpm --filter",
+    "dev:module": "node scripts/run-module.mjs dev",
+    "build:module": "node scripts/run-module.mjs build",
     "lint": "eslint . --ext .js,.cjs,.mjs,.ts,.tsx,.vue --no-error-on-unmatched-pattern",
     "format": "prettier --write ."
   },

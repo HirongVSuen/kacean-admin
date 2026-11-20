@@ -11,17 +11,18 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "preserve",
+    "jsxImportSource": "vue",
     "jsxFactory": "h",
     "jsxFragmentFactory": "Fragment",
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "baseUrl": ".",
     "paths": {
-      "@kacean/types": ["packages/admin-module-types/src"],
-      "@kacean/common": ["packages/common/src"],
-      "@kacean/shared": ["packages/shared-components/src"]
+      "@kacean/types": ["./packages/admin-module-types/src"],
+      "@kacean/core": ["./packages/core/src"],
+      "@kacean/common": ["./packages/common/src"],
+      "@kacean/shared": ["./packages/shared-components/src"]
     }
   },
   "include": ["packages/**/*"],
