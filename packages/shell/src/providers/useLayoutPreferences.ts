@@ -1,9 +1,11 @@
 import { onBeforeUnmount, onMounted, reactive, watch } from 'vue'
 
+export type BrandTheme = 'default' | 'energy-blue' | 'grid-green'
 export type ThemeMode = 'light' | 'dark' | 'system'
 export type NavigationMode = 'side' | 'top'
 
 export interface LayoutPreferences {
+  brandTheme: BrandTheme
   theme: ThemeMode
   navigation: NavigationMode
   contentOnly: boolean
@@ -11,6 +13,7 @@ export interface LayoutPreferences {
 
 const STORAGE_KEY = 'kacean-admin.layout-preferences'
 const defaultPreferences: LayoutPreferences = {
+  brandTheme: 'default',
   theme: 'light',
   navigation: 'side',
   contentOnly: false
@@ -29,6 +32,8 @@ function readPreferences(): LayoutPreferences {
 
     const value = parsed as Partial<LayoutPreferences>
     return {
+      brandTheme:
+        value.brandTheme === 'energy-blue' || value.brandTheme === 'grid-green' ? value.brandTheme : 'default',
       theme: value.theme === 'dark' || value.theme === 'system' ? value.theme : 'light',
       navigation: value.navigation === 'top' ? 'top' : 'side',
       contentOnly: value.contentOnly === true
@@ -38,7 +43,7 @@ function readPreferences(): LayoutPreferences {
   }
 }
 
-/** shell 显示偏好：本地持久化，并将主题同步到 TDesign 的 theme-mode。 */
+/** shell 显示偏好：本地持久化，并同步品牌主题与 TDesign 明暗模式。 */
 export function useLayoutPreferences() {
   const preferences = reactive<LayoutPreferences>(readPreferences())
   let systemThemeMedia: MediaQueryList | undefined
@@ -47,6 +52,7 @@ export function useLayoutPreferences() {
     if (typeof document === 'undefined') return
 
     const dark = preferences.theme === 'dark' || (preferences.theme === 'system' && systemThemeMedia?.matches === true)
+    document.documentElement.setAttribute('data-brand-theme', preferences.brandTheme)
     document.documentElement.setAttribute('theme-mode', dark ? 'dark' : 'light')
     document.documentElement.style.colorScheme = dark ? 'dark' : 'light'
   }
@@ -57,7 +63,7 @@ export function useLayoutPreferences() {
     systemThemeMedia = window.matchMedia('(prefers-color-scheme: dark)')
   }
 
-  watch(() => preferences.theme, applyTheme, { immediate: true })
+  watch([() => preferences.brandTheme, () => preferences.theme], applyTheme, { immediate: true })
   watch(
     preferences,
     (value) => {

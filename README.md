@@ -52,14 +52,14 @@ flowchart TD
     subgraph Providers["能力 Provider（接口定义在 @kacean/types）"]
         Auth["Auth 登录身份<br/>缺省：匿名"]
         Permission["Permission 权限判断<br/>缺省：全部放行"]
-        MenuP["Menu 菜单编排过滤<br/>缺省：权限过滤 + order 排序"]
+        MenuP["Menu 菜单编排过滤<br/>缺省：权限过滤 + order 排序 + group 保留"]
         Layout["Layout 布局骨架（可选）<br/>不注册 = 无头模式"]
     end
 
     Shell["shell 主壳：独立平台<br/>src/kernel.ts 完成组装"]
     Host["外部宿主应用：无头 SDK<br/>自行渲染骨架"]
 
-    M1 & M2 -->|"manifest：menus / routes / permissions"| Load
+    M1 & M2 -->|"manifest：menus（含 group 分组）/ routes / permissions"| Load
     Auth & Permission & MenuP & Layout --> Registry
     Load --> MenuOut & RouteOut
     MenuP -->|"编排"| MenuOut
@@ -80,21 +80,21 @@ flowchart LR
     end
     subgraph Headless["无 LayoutProvider：无头 SDK"]
         direction TB
-        K2["getMenus / getRoutes / hasPermission<br/>仅数据与业务组件，不创建 router 实例"] --> H2["宿主合并进自身路由与布局"]
+        K2["getMenus（含 group 分组）/ getRoutes / hasPermission<br/>仅数据与业务组件，不创建 router 实例"] --> H2["宿主合并进自身路由与布局"]
     end
 ```
 
 内核 `createAdminKernel()`（`@kacean/core`）负责模块加载、契约校验与 Provider 注册中心：
 
 - `auth`：登录身份（缺省匿名）；`permission`：权限判断（缺省放行）；`menu`：菜单编排过滤（缺省内置实现）；`layout`：布局骨架（可选）。
-- **独立平台**：shell 注册 TDesign `LayoutProvider`（`packages/shell/src/providers/TDesignLayout.tsx`），`kernel.createRouter()` 以布局为根路由。默认布局提供浅色 / 深色 / 跟随系统主题、侧边 / 顶部导航切换和大屏专注模式，偏好保存在浏览器 `localStorage`；这些显示能力仅属于 shell，不改变内核与无头模式契约。
+- **独立平台**：shell 注册 TDesign `LayoutProvider`（`packages/shell/src/providers/TDesignLayout.tsx`），`kernel.createRouter()` 以布局为根路由。默认布局提供品牌主题（默认 / 能源蓝 / 电网绿）、浅色 / 深色 / 跟随系统主题、侧边 / 顶部导航切换和大屏专注模式，偏好保存在浏览器 `localStorage`；这些显示能力仅属于 shell，不改变内核与无头模式契约。侧栏顶层菜单按 `group` 分组展示（工作台与业务页面归「操作空间」，用户、组织、系统设置归「系统管理」），大屏模式右上角操作区默认收起，鼠标悬停、键盘聚焦或点击后展开。
 - **无头 SDK**：不注册 `layout`，宿主仅消费 `getMenus()` / `getRoutes()` / `hasPermission()` / 业务组件，自行渲染骨架。
 
 ## 主题与 token
 
 统一使用 TDesign token（`--td-*` CSS 变量），不另建自有 token 层——WC / UMD 嵌入下模块与宿主运行时本就分割，需要统一的只是视觉主题：
 
-- **独立平台**：在 shell `src/styles/theme.css` 集中覆盖 `--td-*` 定制品牌主题；默认布局的主题设置通过根节点 `theme-mode` 切换 TDesign 明暗主题。
+- **独立平台**：在 shell `src/styles/theme.css` 集中覆盖 `--td-*` 定制品牌主题；默认布局通过根节点 `data-brand-theme` 切换品牌配色（`default` / `energy-blue` / `grid-green`），通过 `theme-mode` 切换 TDesign 明暗主题，两者正交组合。
 - **无头嵌入**：宿主在自身样式表覆盖同名 `--td-*` 变量即可。CSS 自定义属性沿 DOM 继承，UMD 普通挂载直接生效；WC + Shadow DOM 下变量可穿透继承（模块样式表需注入 shadow root）；暗色模式由宿主同步挂载容器的 `theme-mode` 属性。
 - **业务模块**：自定义样式只引用 `--td-*` 或 UnoCSS 语义原子类（`text-primary` / `bg-page` / `text-secondary` 等，见 `uno.config.ts` 的 theme 映射），禁止硬编码色值，保证宿主覆盖变量后整体跟随。
 

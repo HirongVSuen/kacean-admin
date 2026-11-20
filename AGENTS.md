@@ -80,20 +80,23 @@ kacean-admin/
   - 菜单/模块清单类型统一定义在 `@kacean/types`（`AdminModuleManifest`、`ModuleMenuItem`），纯类型不含运行时代码。
   - 每个业务模块在自身包内导出 `manifest`（含 `name`、`menus`），菜单数据随模块代码维护，不集中到 shell。
   - shell 在 `packages/shell/src/modules.ts` 显式登记各模块 manifest，经内核 `registerModule` 注册后由 MenuProvider 统一聚合（PermissionProvider 权限过滤 + `order` 排序），模块不直接操作 shell 菜单。
-  - 菜单项 `path` 即路由路径；`icon` 为图标名，由 shell 统一映射，模块不直接依赖图标库；`permission` 为权限码，由 `PermissionProvider` 过滤，且应在模块 manifest 的 `permissions` 中申报。
+  - 菜单项 `path` 即路由路径；`icon` 为图标名，由 shell 统一映射，模块不直接依赖图标库；`permission` 为权限码，由 `PermissionProvider` 过滤，且应在模块 manifest 的 `permissions` 中申报；`group` 为顶层菜单分组标题（如「操作空间」「系统管理」），同名分组跨模块合并，仅用于侧栏视觉归类，不参与路由与权限判断。
   - manifest 的 `routes` 与 `menus` 同源：叶子菜单 path 必须有对应路由（注册时内核校验，含子菜单的父节点不强制）；详情页等可只进 `routes` 不进菜单。路由由内核合并，`packages/shell/src/router.ts` 调 `kernel.createRouter()` 生成，`component` 推荐 `() => import(...)` 懒加载。
   - 双产物链路：模块 `exports` 指向 TS/TSX 源码，shell 静态集成时由 shell 的 Vite 统一编译；模块自身 `build` 产出 ESM（`<模块名>.es.js`）与 UMD（`<模块名>.umd.js`）双产物，UMD 挂 `window.<模块名 PascalCase>` 并暴露 `manifest`，`vue` / `tdesign-vue-next` 外部化为全局 `Vue` / `TDesign`，供 shell 后续的 UMD 模块加载器远程加载。参考 `demo-module`。
   - 模块独立开发（`dev:module`）使用自带简易开发壳（`src/dev/`），不依赖 shell；TDesign 样式仅独立开发时自行引入，集成时由基座全局注入。
 - 样式与主题约束（token 统一走 TDesign，不另建自有 token 层）：
   - 业务模块与 shared-components 的自定义样式只允许引用 TDesign token（`--td-*`）或 `uno.config.ts` 中映射到 token 的语义原子类（`text-primary` / `bg-page` / `text-secondary` 等），禁止硬编码主题相关色值（默认色板类如 `text-gray-500`、`bg-emerald-500`，十六进制色值等）。
   - 主题定制集中在两处：独立平台改 shell `src/styles/theme.css`（覆盖 `--td-*`）；无头嵌入（WC / UMD）由宿主在自身样式表覆盖同名变量，CSS 自定义属性沿 DOM 继承，模块整体跟随。模块自身不得覆盖 `--td-*`。
+  - 品牌主题由根节点 `data-brand-theme` 切换（`default` / `energy-blue` / `grid-green`），与明暗模式（`theme-mode`）正交；新增配色只在 `theme.css` 内以同名属性选择器扩展，模块不自建主题。
   - 组件库 props（如 `theme="primary"`）不受此限；WC + Shadow DOM 嵌入时模块样式表需注入 shadow root，变量可穿透继承。
   - 新增语义原子类时同步 shell 与 demo-module 两份 `uno.config.ts`，保持独立开发与集成表现一致。
 - 独立平台固定视觉与布局约定（除非用户明确要求，不随页面或任务改变整体风格）：
   - 使用浅色、简洁、克制的企业后台风格；统一卡片圆角、边框、间距和字体层级，不随意改成深色侧栏、高饱和渐变或夸张阴影。
-  - 主壳采用 `100dvh` 固定应用壳：默认左侧栏全高、右侧顶栏高 `72px`，支持切换顶部导航与只显示内容区的大屏模式；仅主内容区独立滚动，页面 `body` 不滚动，优先用 Flex 固定壳层，不用 `position: fixed` 让顶栏脱离文档流。
+  - 主壳采用 `100dvh` 固定应用壳：默认左侧栏全高、右侧顶栏高 `72px`，支持切换顶部导航、只显示内容区的大屏模式与品牌主题（默认 / 能源蓝 / 电网绿）；仅主内容区独立滚动，页面 `body` 不滚动，优先用 Flex 固定壳层，不用 `position: fixed` 让顶栏脱离文档流。
   - 展开侧栏宽 `248px`，折叠宽 `72px`；主内容区水平内边距默认 `28px`，窄屏按现有断点收敛，内容最大宽度 `1600px`。
   - 菜单必须递归支持 `children` 子菜单：父节点负责展开/收起，叶子节点负责路由跳转；当前子路由自动展开并高亮父级，折叠侧栏时子菜单使用不被侧栏裁剪的弹层，禁止拍平菜单树。
+  - 侧栏顶层菜单按 `group` 展示分组标题，分组不与子菜单混用：工作台与业务页面归「操作空间」，用户、组织、系统设置归「系统管理」；顶部导航空间有限时保持扁平渲染，不丢失入口。
   - 菜单只保留一个纵向滚动区域；可隐藏滚动条外观，但必须保留滚轮、触摸和键盘可达性，禁止用 `overflow: hidden` 直接裁掉超长菜单或子菜单。
+  - 大屏模式右上角操作区默认收起为低干扰小按钮，鼠标悬停、键盘聚焦或点击后展开完整操作；鼠标移出、焦点离开或点击外部自动收起，`Esc` 退出大屏模式。
   - 修改主壳后至少检查：多级菜单跳转、直接访问子路由、侧栏折叠弹层、顶部菜单溢出、超长菜单滚动、内容滚动时顶栏固定、主题切换、大屏模式退出、窄屏布局，并执行受影响包的验证脚本。
 - 可见回复使用简体中文；代码、命令、字段名保持原文。

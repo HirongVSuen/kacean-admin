@@ -11,6 +11,7 @@ import {
   HeadMenu,
   Layout,
   Menu,
+  MenuGroup,
   MenuItem,
   RadioGroup,
   Submenu,
@@ -41,6 +42,29 @@ function renderMenuItems(items: ModuleMenuItem[]) {
   })
 }
 
+/** 顶层菜单按 group 聚合；同名分组跨模块合并，组内仍保持 MenuProvider 的排序。 */
+function renderSideMenuItems(items: ModuleMenuItem[]) {
+  const groups = new Map<string, { title?: string; items: ModuleMenuItem[] }>()
+
+  items.forEach((item, index) => {
+    // 未声明 group 的菜单保持原样，且彼此独立，避免被错误合并。
+    const key = item.group ? `group:${item.group}` : `ungrouped:${index}`
+    const group = groups.get(key) ?? { title: item.group, items: [] }
+    group.items.push(item)
+    groups.set(key, group)
+  })
+
+  return Array.from(groups, ([key, group]) =>
+    group.title ? (
+      <MenuGroup key={key} title={group.title}>
+        {renderMenuItems(group.items)}
+      </MenuGroup>
+    ) : (
+      renderMenuItems(group.items)
+    )
+  )
+}
+
 /** 找到当前路由的菜单链路，用于标题展示和自动展开父级菜单。 */
 function findMenuTrail(
   items: ModuleMenuItem[],
@@ -61,6 +85,12 @@ const userOptions: DropdownOption[] = [
   { content: '退出登录', value: 'logout' }
 ]
 
+const brandThemeOptions = [
+  { label: '默认', value: 'default' },
+  { label: '能源蓝', value: 'energy-blue' },
+  { label: '电网绿', value: 'grid-green' }
+]
+
 const themeOptions = [
   { label: '浅色', value: 'light' },
   { label: '深色', value: 'dark' },
@@ -73,7 +103,7 @@ const navigationOptions = [
 ]
 
 /**
- * shell 默认 LayoutProvider：支持侧边 / 顶部导航、明暗主题与大屏专注模式。
+ * shell 默认 LayoutProvider：支持侧边 / 顶部导航、品牌主题、明暗模式与大屏专注模式。
  * 菜单与登录身份均来自内核；显示偏好仅保存在 shell，不影响无头模式。
  */
 export function createTDesignLayoutProvider(kernel: AdminKernel): LayoutProvider {
@@ -86,6 +116,8 @@ export function createTDesignLayoutProvider(kernel: AdminKernel): LayoutProvider
       const expandedMenus = ref<string[]>([])
       const user = ref<AdminUser | null>(null)
       const settingsVisible = ref(false)
+      const focusControlsVisible = ref(false)
+      const focusControls = ref<HTMLElement | null>(null)
       const { preferences } = useLayoutPreferences()
       let mobileMedia: MediaQueryList | undefined
 
@@ -99,12 +131,36 @@ export function createTDesignLayoutProvider(kernel: AdminKernel): LayoutProvider
         }
       }
 
+      const showFocusControls = () => {
+        focusControlsVisible.value = true
+      }
+
+      const hideFocusControls = (event: FocusEvent | PointerEvent) => {
+        const target = event.target
+        if (!(target instanceof Node) || !focusControls.value?.contains(target)) {
+          focusControlsVisible.value = false
+        }
+      }
+
+      const handleFocusControlsFocusOut = (event: FocusEvent) => {
+        const nextTarget = event.relatedTarget
+        if (!(nextTarget instanceof Node) || !focusControls.value?.contains(nextTarget)) {
+          focusControlsVisible.value = false
+        }
+      }
+
       const handleMenuChange = (value: string | number) => {
         void router.push(String(value))
       }
 
       const handleMenuExpand = (values: Array<string | number>) => {
         expandedMenus.value = values.map(String)
+      }
+
+      const setBrandTheme = (value: string | number | boolean) => {
+        if (value === 'default' || value === 'energy-blue' || value === 'grid-green') {
+          preferences.brandTheme = value
+        }
       }
 
       const setTheme = (value: string | number | boolean) => {
@@ -127,10 +183,12 @@ export function createTDesignLayoutProvider(kernel: AdminKernel): LayoutProvider
         collapsed.value = mobileMedia.matches
         mobileMedia.addEventListener('change', handleMobileChange)
         window.addEventListener('keydown', handleGlobalKeydown)
+        document.addEventListener('pointerdown', hideFocusControls)
       })
       onBeforeUnmount(() => {
         mobileMedia?.removeEventListener('change', handleMobileChange)
         window.removeEventListener('keydown', handleGlobalKeydown)
+        document.removeEventListener('pointerdown', hideFocusControls)
       })
       void Promise.resolve(kernel.getUser()).then((current) => (user.value = current))
 
@@ -139,6 +197,13 @@ export function createTDesignLayoutProvider(kernel: AdminKernel): LayoutProvider
       const activeMenu = computed(() => route.path)
       const activeTrail = computed(() => findMenuTrail(menus.value, route.path) ?? [])
       const currentTitle = computed(() => activeTrail.value[activeTrail.value.length - 1]?.title ?? '控制台')
+
+      watch(
+        () => preferences.contentOnly,
+        () => {
+          focusControlsVisible.value = false
+        }
+      )
 
       // 路由进入子页面时保留已展开菜单，并自动展开当前路由的所有父级
       watch(
@@ -222,6 +287,21 @@ export function createTDesignLayoutProvider(kernel: AdminKernel): LayoutProvider
           <div class="layout-settings">
             <section class="layout-setting">
               <div class="layout-setting__copy">
+                <strong>品牌主题</strong>
+                <span>选择默认、能源蓝或电网绿，业务模块会随 token 整体换肤。</span>
+              </div>
+              <RadioGroup
+                class="layout-setting__options"
+                value={preferences.brandTheme}
+                options={brandThemeOptions}
+                theme="button"
+                variant="default-filled"
+                onChange={setBrandTheme}
+              />
+            </section>
+
+            <section class="layout-setting">
+              <div class="layout-setting__copy">
                 <strong>主题模式</strong>
                 <span>切换浅色、深色，或跟随操作系统外观。</span>
               </div>
@@ -281,7 +361,6 @@ export function createTDesignLayoutProvider(kernel: AdminKernel): LayoutProvider
               {renderBrand()}
 
               <nav class="admin-aside__navigation" aria-label="主导航">
-                {!collapsed.value && <div class="admin-aside__caption">工作空间</div>}
                 <Menu
                   class="admin-menu"
                   value={activeMenu.value}
@@ -290,7 +369,7 @@ export function createTDesignLayoutProvider(kernel: AdminKernel): LayoutProvider
                   onChange={handleMenuChange}
                   onExpand={handleMenuExpand}
                 >
-                  {renderMenuItems(menus.value)}
+                  {renderSideMenuItems(menus.value)}
                 </Menu>
               </nav>
 
@@ -354,20 +433,62 @@ export function createTDesignLayoutProvider(kernel: AdminKernel): LayoutProvider
           )}
 
           {preferences.contentOnly && (
-            <div class="admin-focus-controls" role="toolbar" aria-label="大屏模式操作">
-              <Tooltip content="退出大屏模式（Esc）" placement="left">
-                <Button
-                  variant="text"
-                  shape="square"
-                  aria-label="退出大屏模式"
-                  onClick={() => {
-                    preferences.contentOnly = false
-                  }}
-                >
-                  <AppIcon name="fullscreen-exit" size={20} />
-                </Button>
-              </Tooltip>
-              {renderSettingsButton()}
+            <div
+              ref={focusControls}
+              class={['admin-focus-controls', { 'is-expanded': focusControlsVisible.value }]}
+              onMouseenter={showFocusControls}
+              onMouseleave={() => {
+                focusControlsVisible.value = false
+              }}
+              onFocusin={showFocusControls}
+              onFocusout={handleFocusControlsFocusOut}
+            >
+              <button
+                type="button"
+                class="admin-focus-controls__trigger"
+                aria-label="大屏模式操作"
+                aria-expanded={focusControlsVisible.value}
+                aria-controls="admin-focus-controls-panel"
+                onClick={showFocusControls}
+              >
+                <AppIcon name="chevron-down" size={18} />
+              </button>
+
+              <div
+                id="admin-focus-controls-panel"
+                class="admin-focus-controls__panel"
+                role="toolbar"
+                aria-label="大屏模式操作"
+                aria-hidden={!focusControlsVisible.value}
+              >
+                <div class="admin-focus-controls__surface">
+                  <Tooltip content="退出大屏模式（Esc）" placement="left">
+                    <Button
+                      variant="text"
+                      shape="square"
+                      aria-label="退出大屏模式"
+                      onClick={() => {
+                        preferences.contentOnly = false
+                      }}
+                    >
+                      <AppIcon name="fullscreen-exit" size={20} />
+                    </Button>
+                  </Tooltip>
+                  <Tooltip content="界面设置" placement="left">
+                    <Button
+                      class="admin-settings-button"
+                      variant="text"
+                      shape="square"
+                      aria-label="界面设置"
+                      onClick={() => {
+                        settingsVisible.value = true
+                      }}
+                    >
+                      <AppIcon name="setting" size={20} />
+                    </Button>
+                  </Tooltip>
+                </div>
+              </div>
             </div>
           )}
 

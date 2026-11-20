@@ -4,19 +4,221 @@
  * - 无头嵌入（WC / UMD）：由宿主在自身样式表覆盖同名变量，CSS 自定义属性沿 DOM 继承，
  *   UMD 普通挂载直接生效；WC + Shadow DOM 下变量可穿透继承，但模块样式表需注入 shadow root。
  * - 暗色模式：TDesign 通过 theme-mode 属性切换，宿主暗色切换时同步设置挂载容器的 theme-mode。
+ * - 品牌主题：独立平台通过 data-brand-theme 切换 default / energy-blue / grid-green。
  * 业务模块只允许引用 --td-* 变量，不得在此覆盖以外的位置定制主题。
  */
 :root {
   color: var(--td-text-color-primary);
   background: var(--td-bg-color-page);
   font-family:
-    Inter, "PingFang SC", "Microsoft YaHei", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    Inter,
+    'PingFang SC',
+    'Microsoft YaHei',
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
+}
 
-  /* 示例：定制品牌色（缺省使用 TDesign 默认主题）
-  --td-brand-color: #0052d9;
-  */
+/*
+ * 品牌主题通过 data-brand-theme 切换，明暗模式仍使用 TDesign 的 theme-mode。
+ * 未设置 data-brand-theme 或设置为 default 时，完整保留 TDesign 默认主题。
+ * 浅色选择器兼容宿主只设置品牌属性、尚未设置 theme-mode 的初始状态。
+ */
+
+/* 能源蓝 · 浅色 */
+:root[data-brand-theme='energy-blue']:not([theme-mode='dark']) {
+  --td-brand-color-1: #eaf3ff;
+  --td-brand-color-2: #d0e3fa;
+  --td-brand-color-3: #a9c9f2;
+  --td-brand-color-4: #78a7e5;
+  --td-brand-color-5: #4c8edb;
+  --td-brand-color-6: #2b78d4;
+  --td-brand-color-7: #0b63ce;
+  --td-brand-color-8: #0a56b3;
+  --td-brand-color-9: #084794;
+  --td-brand-color-10: #06336b;
+  --td-success-color-1: #e7f5f0;
+  --td-success-color-2: #c8e9de;
+  --td-success-color-3: #93cdba;
+  --td-success-color-4: #55ae91;
+  --td-success-color-5: #078268;
+  --td-success-color-6: #006f59;
+  --td-success-color-7: #005d4b;
+  --td-success-color-8: #004c3e;
+  --td-success-color-9: #003b31;
+  --td-success-color-10: #002b24;
+  --td-bg-color-page: #f3f7fa;
+  --td-bg-color-container: #fff;
+  --td-bg-color-container-hover: #f0f5f8;
+  --td-bg-color-container-active: #e2ebf0;
+  --td-bg-color-container-select: #fff;
+  --td-bg-color-secondarycontainer: #f0f5f8;
+  --td-bg-color-secondarycontainer-hover: #e4edf2;
+  --td-bg-color-secondarycontainer-active: #d4e0e8;
+  --td-bg-color-component: #e2ebf2;
+  --td-bg-color-component-hover: #cfdde8;
+  --td-bg-color-component-active: #a9becc;
+  --td-bg-color-secondarycomponent: #d4e0e9;
+  --td-bg-color-secondarycomponent-hover: #b9cbd8;
+  --td-bg-color-secondarycomponent-active: #9fb4c3;
+  --td-bg-color-component-disabled: #edf2f5;
+  --td-bg-color-specialcomponent: #fff;
+  --td-text-color-primary: #182b3a;
+  --td-text-color-secondary: #586e7d;
+  --td-text-color-placeholder: #899aa6;
+  --td-text-color-disabled: #b1bec7;
+  --td-border-level-1-color: #dce5ec;
+  --td-component-stroke: #dce5ec;
+  --td-border-level-2-color: #c7d5df;
+  --td-component-border: #c7d5df;
+}
+
+/* 能源蓝 · 深色 */
+:root[data-brand-theme='energy-blue'][theme-mode='dark'] {
+  --td-brand-color-1: #172c40;
+  --td-brand-color-2: #183a56;
+  --td-brand-color-3: #17466b;
+  --td-brand-color-4: #145685;
+  --td-brand-color-5: #1065a2;
+  --td-brand-color-6: #1675bc;
+  --td-brand-color-7: #2e83c4;
+  --td-brand-color-8: #4a93d8;
+  --td-brand-color-9: #78b5e8;
+  --td-brand-color-10: #b3d7f5;
+  --td-success-color-1: #17372f;
+  --td-success-color-2: #19453a;
+  --td-success-color-3: #195344;
+  --td-success-color-4: #136b53;
+  --td-success-color-5: #0b9370;
+  --td-success-color-6: #2aa582;
+  --td-success-color-7: #4ab897;
+  --td-success-color-8: #79cbb0;
+  --td-success-color-9: #a8ddc8;
+  --td-success-color-10: #d0e9de;
+  --td-bg-color-page: #0f1923;
+  --td-bg-color-container: #16242f;
+  --td-bg-color-container-hover: #1b2d3a;
+  --td-bg-color-container-active: #223844;
+  --td-bg-color-container-select: #1d425b;
+  --td-bg-color-secondarycontainer: #1b2d3a;
+  --td-bg-color-secondarycontainer-hover: #223844;
+  --td-bg-color-secondarycontainer-active: #2a424f;
+  --td-bg-color-component: #2a3d49;
+  --td-bg-color-component-hover: #354c59;
+  --td-bg-color-component-active: #45606e;
+  --td-bg-color-secondarycomponent: #354c59;
+  --td-bg-color-secondarycomponent-hover: #45606e;
+  --td-bg-color-secondarycomponent-active: #5a7481;
+  --td-bg-color-component-disabled: #1b2d3a;
+  --td-bg-color-specialcomponent: transparent;
+  --td-text-color-primary: #e6eef3;
+  --td-text-color-secondary: #a7b7c2;
+  --td-text-color-placeholder: #728792;
+  --td-text-color-disabled: #536873;
+  --td-border-level-1-color: #2a3d49;
+  --td-component-stroke: #2a3d49;
+  --td-border-level-2-color: #3a5260;
+  --td-component-border: #3a5260;
+}
+
+/* 电网绿 · 浅色 */
+:root[data-brand-theme='grid-green']:not([theme-mode='dark']) {
+  --td-brand-color-1: #e6f4ef;
+  --td-brand-color-2: #c9e8dd;
+  --td-brand-color-3: #98cdbd;
+  --td-brand-color-4: #62ae98;
+  --td-brand-color-5: #33967b;
+  --td-brand-color-6: #1b9277;
+  --td-brand-color-7: #007f67;
+  --td-brand-color-8: #006b58;
+  --td-brand-color-9: #005748;
+  --td-brand-color-10: #004337;
+  --td-success-color-1: #e7f4ed;
+  --td-success-color-2: #c8e8d7;
+  --td-success-color-3: #91cbae;
+  --td-success-color-4: #52ac81;
+  --td-success-color-5: #13805d;
+  --td-success-color-6: #0d6d4e;
+  --td-success-color-7: #095b41;
+  --td-success-color-8: #064a35;
+  --td-success-color-9: #043a2b;
+  --td-success-color-10: #032c20;
+  --td-bg-color-page: #f3f8f6;
+  --td-bg-color-container: #fff;
+  --td-bg-color-container-hover: #f0f6f3;
+  --td-bg-color-container-active: #e1ece7;
+  --td-bg-color-container-select: #fff;
+  --td-bg-color-secondarycontainer: #f0f6f3;
+  --td-bg-color-secondarycontainer-hover: #e6f0eb;
+  --td-bg-color-secondarycontainer-active: #d5e5de;
+  --td-bg-color-component: #e3ece8;
+  --td-bg-color-component-hover: #d5e3dd;
+  --td-bg-color-component-active: #b8cdc3;
+  --td-bg-color-secondarycomponent: #d5e3dd;
+  --td-bg-color-secondarycomponent-hover: #bdd2c9;
+  --td-bg-color-secondarycomponent-active: #9fb9ad;
+  --td-bg-color-component-disabled: #edf3f0;
+  --td-bg-color-specialcomponent: #fff;
+  --td-text-color-primary: #193029;
+  --td-text-color-secondary: #587168;
+  --td-text-color-placeholder: #899d95;
+  --td-text-color-disabled: #b0c0b9;
+  --td-border-level-1-color: #dce8e3;
+  --td-component-stroke: #dce8e3;
+  --td-border-level-2-color: #c7d9d1;
+  --td-component-border: #c7d9d1;
+}
+
+/* 电网绿 · 深色 */
+:root[data-brand-theme='grid-green'][theme-mode='dark'] {
+  --td-brand-color-1: #15352d;
+  --td-brand-color-2: #17453a;
+  --td-brand-color-3: #175344;
+  --td-brand-color-4: #146652;
+  --td-brand-color-5: #107a61;
+  --td-brand-color-6: #118d70;
+  --td-brand-color-7: #16896b;
+  --td-brand-color-8: #2aa17f;
+  --td-brand-color-9: #58bc9a;
+  --td-brand-color-10: #a2dcc4;
+  --td-success-color-1: #19352a;
+  --td-success-color-2: #1b4131;
+  --td-success-color-3: #1b4d38;
+  --td-success-color-4: #146342;
+  --td-success-color-5: #16865f;
+  --td-success-color-6: #27966f;
+  --td-success-color-7: #46ab84;
+  --td-success-color-8: #75c3a4;
+  --td-success-color-9: #a9d9c3;
+  --td-success-color-10: #d2e7db;
+  --td-bg-color-page: #0f1b18;
+  --td-bg-color-container: #162823;
+  --td-bg-color-container-hover: #1b332b;
+  --td-bg-color-container-active: #23443a;
+  --td-bg-color-container-select: #1d4b3c;
+  --td-bg-color-secondarycontainer: #1b332b;
+  --td-bg-color-secondarycontainer-hover: #23443a;
+  --td-bg-color-secondarycontainer-active: #2b5145;
+  --td-bg-color-component: #2a453c;
+  --td-bg-color-component-hover: #36564b;
+  --td-bg-color-component-active: #486b5e;
+  --td-bg-color-secondarycomponent: #36564b;
+  --td-bg-color-secondarycomponent-hover: #486b5e;
+  --td-bg-color-secondarycomponent-active: #5c8071;
+  --td-bg-color-component-disabled: #1b332b;
+  --td-bg-color-specialcomponent: transparent;
+  --td-text-color-primary: #e4f0ea;
+  --td-text-color-secondary: #a4b9af;
+  --td-text-color-placeholder: #728c80;
+  --td-text-color-disabled: #526a5f;
+  --td-border-level-1-color: #2a453c;
+  --td-component-stroke: #2a453c;
+  --td-border-level-2-color: #3b5a4e;
+  --td-component-border: #3b5a4e;
 }
 
 html,

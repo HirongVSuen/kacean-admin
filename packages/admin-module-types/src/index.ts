@@ -30,6 +30,11 @@ export interface ModuleMenuItem {
   order?: number
   /** 权限码，shell 按当前用户过滤，缺省表示不限制 */
   permission?: string
+  /**
+   * 顶层菜单的分组标题，例如「操作空间」「系统管理」。
+   * 同名分组跨模块合并；分组仅用于导航归类，不参与路由，也不影响子菜单递归。
+   */
+  group?: string
   children?: ModuleMenuItem[]
 }
 

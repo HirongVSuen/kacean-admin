@@ -75,6 +75,20 @@ function renderIconPath(name: string) {
           <path d="m8 12 2.5 2.5L16 9" />
         </>
       )
+    case 'user':
+      return (
+        <>
+          <circle cx="12" cy="8" r="4" />
+          <path d="M4.5 21a7.5 7.5 0 0 1 15 0" />
+        </>
+      )
+    case 'organization':
+      return (
+        <>
+          <path d="M4 21V7l8-4 8 4v14" />
+          <path d="M9 21v-5h6v5M8 10h.01M12 10h.01M16 10h.01M8 13h.01M12 13h.01M16 13h.01" />
+        </>
+      )
     case 'app':
     default:
       return (

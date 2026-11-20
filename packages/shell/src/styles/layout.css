@@ -83,12 +83,28 @@
   overflow: hidden;
 }
 
-.admin-aside__caption {
-  padding: 8px 24px 12px;
+/* 顶层菜单按 group 展示为分组标题；分组不参与路由，组内仍可递归子菜单。 */
+.admin-shell .admin-aside .admin-menu .t-menu-group__title {
+  padding: 10px 12px 6px;
   color: var(--td-text-color-placeholder);
   font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.12em;
+  line-height: 16px;
+  letter-spacing: 0.08em;
+}
+
+.admin-shell .admin-aside .admin-menu .t-menu-group:first-child .t-menu-group__title {
+  padding-top: 2px;
+}
+
+.admin-shell .admin-aside .admin-menu .t-menu-group + .t-menu-group {
+  margin-top: 10px;
+}
+
+.admin-shell .admin-aside .admin-menu.t-is-collapsed .t-menu-group__title {
+  padding: 0;
+  font-size: 0;
+  letter-spacing: 0;
 }
 
 .admin-shell .admin-aside .admin-menu,
@@ -360,19 +376,76 @@
   top: 16px;
   right: 16px;
   display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.admin-focus-controls__trigger {
+  display: flex;
+  width: 34px;
+  height: 34px;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid var(--td-component-stroke);
+  border-radius: 50%;
+  background: var(--td-bg-color-container);
+  box-shadow: var(--td-shadow-1);
+  color: var(--td-text-color-secondary);
+  cursor: pointer;
+  opacity: 0.48;
+  transition:
+    opacity 0.2s,
+    color 0.2s,
+    box-shadow 0.2s;
+}
+
+.admin-focus-controls__trigger:hover,
+.admin-focus-controls__trigger:focus-visible,
+.admin-focus-controls.is-expanded .admin-focus-controls__trigger {
+  color: var(--td-brand-color);
+  box-shadow: var(--td-shadow-2);
+  opacity: 1;
+}
+
+.admin-focus-controls__trigger .app-icon {
+  transition: transform 0.2s;
+}
+
+.admin-focus-controls.is-expanded .admin-focus-controls__trigger .app-icon {
+  transform: rotate(180deg);
+}
+
+.admin-focus-controls__panel {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  padding-top: 8px;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-6px);
+  transition:
+    opacity 0.2s,
+    transform 0.2s,
+    visibility 0.2s;
+  visibility: hidden;
+}
+
+.admin-focus-controls.is-expanded .admin-focus-controls__panel {
+  opacity: 1;
+  pointer-events: auto;
+  transform: none;
+  visibility: visible;
+}
+
+.admin-focus-controls__surface {
+  display: flex;
   gap: 4px;
   padding: 4px;
   border: 1px solid var(--td-component-stroke);
   border-radius: var(--td-radius-medium);
   background: var(--td-bg-color-container);
   box-shadow: var(--td-shadow-2);
-  opacity: 0.72;
-  transition: opacity 0.2s;
-}
-
-.admin-focus-controls:hover,
-.admin-focus-controls:focus-within {
-  opacity: 1;
 }
 
 .layout-settings-dialog {
@@ -511,7 +584,9 @@
 
 @media (prefers-reduced-motion: reduce) {
   .admin-aside,
-  .admin-focus-controls,
+  .admin-focus-controls__trigger,
+  .admin-focus-controls__trigger .app-icon,
+  .admin-focus-controls__panel,
   .admin-user {
     transition: none;
   }

@@ -10,6 +10,7 @@ export const manifest: AdminModuleManifest = {
       path: '/demo-module',
       title: '示例模块',
       icon: 'app',
+      group: '操作空间',
       order: 10,
       permission: 'demo-module:list',
       children: [
