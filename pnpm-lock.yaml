@@ -41,6 +41,10 @@ importers:
       '@kacean/types':
         specifier: workspace:*
         version: link:../admin-module-types
+    devDependencies:
+      vue:
+        specifier: ^3.5.45
+        version: 3.5.45(typescript@6.0.3)
 
   packages/core:
     dependencies:
@@ -55,8 +59,14 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
 
-  packages/modules/demo-module:
+  packages/modules/template-module:
     dependencies:
+      '@kacean/common':
+        specifier: workspace:*
+        version: link:../../common
+      '@kacean/shared':
+        specifier: workspace:*
+        version: link:../../shared-components
       '@kacean/types':
         specifier: workspace:*
         version: link:../../admin-module-types
@@ -85,6 +95,9 @@ importers:
 
   packages/shared-components:
     dependencies:
+      tdesign-vue-next:
+        specifier: ^1.20.0
+        version: 1.20.11(vue@3.5.45(typescript@6.0.3))
       vue:
         specifier: ^3.5.0
         version: 3.5.45(typescript@6.0.3)
@@ -103,12 +116,12 @@ importers:
       '@kacean/types':
         specifier: workspace:*
         version: link:../admin-module-types
-      demo-module:
-        specifier: workspace:*
-        version: link:../modules/demo-module
       tdesign-vue-next:
         specifier: ^1.20.11
         version: 1.20.11(vue@3.5.45(typescript@6.0.3))
+      template-module:
+        specifier: workspace:*
+        version: link:../modules/template-module
       vue:
         specifier: ^3.5.13
         version: 3.5.45(typescript@6.0.3)

@@ -1,5 +1,8 @@
 export { createAdminKernel } from './kernel'
 export type { AdminKernel } from './kernel'
+export { createStaticModuleLoader } from './loader'
+export type { StaticModuleLoaderOptions } from './loader'
+export { satisfiesVersion } from './semver'
 export { createDefaultMenuProvider } from './menu'
 export { resolveRoutes, createAdminRouter } from './router'
 export type { CreateAdminRouterOptions } from './router'

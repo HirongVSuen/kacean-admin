@@ -11,7 +11,7 @@ export default defineComponent({
   setup() {
     const router = useRouter()
     // 公共包链路自检：types → common → shared → shell
-    const res: ApiResponse<string> = { code: 0, message: 'ok', data: 'types → common → shared → shell 全部打通' }
+    const res: ApiResponse<string> = { code: '0', message: 'ok', data: 'types → common → shared → shell 全部打通' }
     const demoMessage = computed(() => (isSuccessResponse(res) ? res.data : res.message))
 
     const overviewItems = computed(() => [
@@ -54,8 +54,8 @@ export default defineComponent({
             <h1>欢迎回来，开始今天的工作</h1>
             <p>模块、路由与公共能力均已就绪，从这里高效管理你的业务。</p>
             <div class="dashboard-hero__actions">
-              <Button theme="primary" onClick={() => router.push('/demo-module/list')}>
-                浏览示例模块
+              <Button theme="primary" onClick={() => router.push('/system/users')}>
+                进入用户管理
                 <AppIcon name="arrow-right" size={16} />
               </Button>
               <Button variant="outline" onClick={() => router.push('/settings')}>
@@ -89,13 +89,13 @@ export default defineComponent({
         <section class="dashboard-details">
           <Card title="快捷入口" bordered>
             <div class="dashboard-shortcuts">
-              <button type="button" class="dashboard-shortcut" onClick={() => router.push('/demo-module/list')}>
+              <button type="button" class="dashboard-shortcut" onClick={() => router.push('/system/users')}>
                 <span class="dashboard-shortcut__icon">
-                  <AppIcon name="app" size={20} />
+                  <AppIcon name="user" size={20} />
                 </span>
                 <span class="dashboard-shortcut__content">
-                  <strong>示例模块</strong>
-                  <span>查看业务模块的菜单、路由与交互示例</span>
+                  <strong>用户管理</strong>
+                  <span>维护平台用户、账号状态与角色权限</span>
                 </span>
                 <AppIcon name="arrow-right" size={18} />
               </button>

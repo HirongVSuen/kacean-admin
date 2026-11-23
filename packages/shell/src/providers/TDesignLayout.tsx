@@ -1,4 +1,4 @@
-import { computed, defineComponent, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, defineComponent, onBeforeUnmount, onMounted, provide, ref, watch } from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
 import {
   Aside,
@@ -21,7 +21,9 @@ import {
 import type { DropdownOption } from 'tdesign-vue-next'
 import type { AdminUser, LayoutProvider, ModuleMenuItem } from '@kacean/types'
 import type { AdminKernel } from '@kacean/core'
+import { PANEL_CONTROLLER_KEY } from '@kacean/common'
 import AppIcon from '../components/AppIcon'
+import { createGlobalPanel } from './globalPanel'
 import { useLayoutPreferences } from './useLayoutPreferences'
 import '../styles/layout.css'
 
@@ -88,7 +90,8 @@ const userOptions: DropdownOption[] = [
 const brandThemeOptions = [
   { label: '默认', value: 'default' },
   { label: '能源蓝', value: 'energy-blue' },
-  { label: '电网绿', value: 'grid-green' }
+  { label: '国网绿', value: 'sgcc-green' },
+  { label: '活力橙', value: 'vibrant-orange' }
 ]
 
 const themeOptions = [
@@ -103,7 +106,7 @@ const navigationOptions = [
 ]
 
 /**
- * shell 默认 LayoutProvider：支持侧边 / 顶部导航、品牌主题、明暗模式与大屏专注模式。
+ * shell 默认 LayoutProvider：支持侧边 / 顶部导航、品牌主题、明暗模式与沉浸模式。
  * 菜单与登录身份均来自内核；显示偏好仅保存在 shell，不影响无头模式。
  */
 export function createTDesignLayoutProvider(kernel: AdminKernel): LayoutProvider {
@@ -119,6 +122,9 @@ export function createTDesignLayoutProvider(kernel: AdminKernel): LayoutProvider
       const focusControlsVisible = ref(false)
       const focusControls = ref<HTMLElement | null>(null)
       const { preferences } = useLayoutPreferences()
+      // 全局右侧面板：模块通过注入控制器打开，未注入的环境由模块自行降级。
+      const globalPanel = createGlobalPanel()
+      provide(PANEL_CONTROLLER_KEY, globalPanel.controller)
       let mobileMedia: MediaQueryList | undefined
 
       const handleMobileChange = (event: MediaQueryListEvent) => {
@@ -158,7 +164,7 @@ export function createTDesignLayoutProvider(kernel: AdminKernel): LayoutProvider
       }
 
       const setBrandTheme = (value: string | number | boolean) => {
-        if (value === 'default' || value === 'energy-blue' || value === 'grid-green') {
+        if (value === 'default' || value === 'energy-blue' || value === 'sgcc-green' || value === 'vibrant-orange') {
           preferences.brandTheme = value
         }
       }
@@ -197,6 +203,8 @@ export function createTDesignLayoutProvider(kernel: AdminKernel): LayoutProvider
       const activeMenu = computed(() => route.path)
       const activeTrail = computed(() => findMenuTrail(menus.value, route.path) ?? [])
       const currentTitle = computed(() => activeTrail.value[activeTrail.value.length - 1]?.title ?? '控制台')
+
+      watch(() => route.fullPath, globalPanel.handleRouteChange)
 
       watch(
         () => preferences.contentOnly,
@@ -242,6 +250,20 @@ export function createTDesignLayoutProvider(kernel: AdminKernel): LayoutProvider
         </Dropdown>
       )
 
+      const renderImmersionButton = () => (
+        <Tooltip content="进入沉浸模式" placement="bottom">
+          <Button
+            class="admin-immersion-button"
+            variant="text"
+            shape="square"
+            aria-label="进入沉浸模式"
+            onClick={() => handleContentOnlyChange(true)}
+          >
+            <AppIcon name="fullscreen-enter" size={20} />
+          </Button>
+        </Tooltip>
+      )
+
       const renderSettingsButton = () => (
         <Tooltip content="界面设置" placement="bottom">
           <Button
@@ -260,6 +282,7 @@ export function createTDesignLayoutProvider(kernel: AdminKernel): LayoutProvider
 
       const renderHeaderActions = () => (
         <div class="admin-header__actions">
+          {renderImmersionButton()}
           {renderSettingsButton()}
           {renderUser()}
         </div>
@@ -271,6 +294,14 @@ export function createTDesignLayoutProvider(kernel: AdminKernel): LayoutProvider
             <RouterView />
           </div>
         </Content>
+      )
+
+      // 工作区 = 内容区 + 全局右侧面板（dock 推挤 / 窄屏 overlay），三种导航形态共用。
+      const renderWorkspace = () => (
+        <div class="admin-workspace">
+          {renderContent()}
+          <globalPanel.GlobalPanelHost />
+        </div>
       )
 
       const renderSettingsDialog = () => (
@@ -288,7 +319,7 @@ export function createTDesignLayoutProvider(kernel: AdminKernel): LayoutProvider
             <section class="layout-setting">
               <div class="layout-setting__copy">
                 <strong>品牌主题</strong>
-                <span>选择默认、能源蓝或电网绿，业务模块会随 token 整体换肤。</span>
+                <span>选择默认、能源蓝、国网绿或活力橙，业务模块会随 token 整体换肤。</span>
               </div>
               <RadioGroup
                 class="layout-setting__options"
@@ -332,14 +363,14 @@ export function createTDesignLayoutProvider(kernel: AdminKernel): LayoutProvider
 
             <section class="layout-setting layout-setting--switch">
               <div class="layout-setting__copy">
-                <strong>大屏模式</strong>
+                <strong>沉浸模式</strong>
                 <span>隐藏导航和顶栏，内容区全宽且无内边距显示。</span>
               </div>
-              <Switch value={preferences.contentOnly} aria-label="大屏模式" onChange={handleContentOnlyChange} />
+              <Switch value={preferences.contentOnly} aria-label="沉浸模式" onChange={handleContentOnlyChange} />
             </section>
 
             <p class="layout-settings__tip">
-              设置会自动保存。大屏模式下可通过右上角按钮或 <kbd>Esc</kbd> 恢复布局。
+              设置会自动保存。沉浸模式下可通过右上角按钮或 <kbd>Esc</kbd> 恢复布局。
             </p>
           </div>
         </Dialog>
@@ -386,7 +417,7 @@ export function createTDesignLayoutProvider(kernel: AdminKernel): LayoutProvider
           )}
 
           {preferences.contentOnly ? (
-            renderContent()
+            renderWorkspace()
           ) : preferences.navigation === 'top' ? (
             <>
               <Header height="72px" class="admin-header admin-header--top">
@@ -401,7 +432,7 @@ export function createTDesignLayoutProvider(kernel: AdminKernel): LayoutProvider
                   {renderMenuItems(menus.value)}
                 </HeadMenu>
               </Header>
-              {renderContent()}
+              {renderWorkspace()}
             </>
           ) : (
             <Layout class="admin-main">
@@ -428,7 +459,7 @@ export function createTDesignLayoutProvider(kernel: AdminKernel): LayoutProvider
                 {renderHeaderActions()}
               </Header>
 
-              {renderContent()}
+              {renderWorkspace()}
             </Layout>
           )}
 
@@ -446,7 +477,7 @@ export function createTDesignLayoutProvider(kernel: AdminKernel): LayoutProvider
               <button
                 type="button"
                 class="admin-focus-controls__trigger"
-                aria-label="大屏模式操作"
+                aria-label="沉浸模式操作"
                 aria-expanded={focusControlsVisible.value}
                 aria-controls="admin-focus-controls-panel"
                 onClick={showFocusControls}
@@ -458,15 +489,15 @@ export function createTDesignLayoutProvider(kernel: AdminKernel): LayoutProvider
                 id="admin-focus-controls-panel"
                 class="admin-focus-controls__panel"
                 role="toolbar"
-                aria-label="大屏模式操作"
+                aria-label="沉浸模式操作"
                 aria-hidden={!focusControlsVisible.value}
               >
                 <div class="admin-focus-controls__surface">
-                  <Tooltip content="退出大屏模式（Esc）" placement="left">
+                  <Tooltip content="退出沉浸模式（Esc）" placement="left">
                     <Button
                       variant="text"
                       shape="square"
-                      aria-label="退出大屏模式"
+                      aria-label="退出沉浸模式"
                       onClick={() => {
                         preferences.contentOnly = false
                       }}

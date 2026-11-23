@@ -4,7 +4,7 @@
  * - 无头嵌入（WC / UMD）：由宿主在自身样式表覆盖同名变量，CSS 自定义属性沿 DOM 继承，
  *   UMD 普通挂载直接生效；WC + Shadow DOM 下变量可穿透继承，但模块样式表需注入 shadow root。
  * - 暗色模式：TDesign 通过 theme-mode 属性切换，宿主暗色切换时同步设置挂载容器的 theme-mode。
- * - 品牌主题：独立平台通过 data-brand-theme 切换 default / energy-blue / grid-green。
+ * - 品牌主题：独立平台通过 data-brand-theme 切换 default / energy-blue / sgcc-green / vibrant-orange。
  * 业务模块只允许引用 --td-* 变量，不得在此覆盖以外的位置定制主题。
  */
 :root {
@@ -21,6 +21,14 @@
     sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
+
+  /* 壳层氛围变量：默认主题保持原有浅色中性外观，品牌主题在各选择器内覆盖。 */
+  --shell-aside-bg: var(--td-bg-color-container);
+  --shell-header-bg: var(--td-bg-color-container);
+  --shell-content-bg: var(--td-bg-color-page);
+  --shell-brand-mark-bg: var(--td-brand-color);
+  --shell-menu-active-bg: var(--td-brand-color-light);
+  --shell-aside-footer-bg: var(--td-bg-color-page);
 }
 
 /*
@@ -29,18 +37,18 @@
  * 浅色选择器兼容宿主只设置品牌属性、尚未设置 theme-mode 的初始状态。
  */
 
-/* 能源蓝 · 浅色 */
+/* 能源蓝 · 浅色（参考中核、国家能源集团等能源央企的稳重正蓝） */
 :root[data-brand-theme='energy-blue']:not([theme-mode='dark']) {
-  --td-brand-color-1: #eaf3ff;
-  --td-brand-color-2: #d0e3fa;
-  --td-brand-color-3: #a9c9f2;
-  --td-brand-color-4: #78a7e5;
-  --td-brand-color-5: #4c8edb;
-  --td-brand-color-6: #2b78d4;
-  --td-brand-color-7: #0b63ce;
-  --td-brand-color-8: #0a56b3;
-  --td-brand-color-9: #084794;
-  --td-brand-color-10: #06336b;
+  --td-brand-color-1: #e9f1f8;
+  --td-brand-color-2: #cddff0;
+  --td-brand-color-3: #a3c3e2;
+  --td-brand-color-4: #6f9fcf;
+  --td-brand-color-5: #3f83bd;
+  --td-brand-color-6: #1a70b5;
+  --td-brand-color-7: #005ba8;
+  --td-brand-color-8: #004c8e;
+  --td-brand-color-9: #003e75;
+  --td-brand-color-10: #002f59;
   --td-success-color-1: #e7f5f0;
   --td-success-color-2: #c8e9de;
   --td-success-color-3: #93cdba;
@@ -51,7 +59,7 @@
   --td-success-color-8: #004c3e;
   --td-success-color-9: #003b31;
   --td-success-color-10: #002b24;
-  --td-bg-color-page: #f3f7fa;
+  --td-bg-color-page: #f0f4f9;
   --td-bg-color-container: #fff;
   --td-bg-color-container-hover: #f0f5f8;
   --td-bg-color-container-active: #e2ebf0;
@@ -75,20 +83,28 @@
   --td-component-stroke: #dce5ec;
   --td-border-level-2-color: #c7d5df;
   --td-component-border: #c7d5df;
+  /* 能源蓝壳层氛围：侧栏淡蓝渐变、顶栏品牌条与内容区微光晕，避免仅靠文字显色。 */
+  --shell-aside-bg: linear-gradient(180deg, var(--td-brand-color-2) 0%, var(--td-brand-color-1) 38%, #fff 100%);
+  --shell-header-bg: linear-gradient(90deg, var(--td-brand-color-1) 0%, #fff 65%);
+  --shell-content-bg:
+    radial-gradient(1000px 400px at 90% -10%, rgb(0 91 168 / 7%), transparent 60%), var(--td-bg-color-page);
+  --shell-brand-mark-bg: linear-gradient(135deg, var(--td-brand-color-7), var(--td-brand-color-5));
+  --shell-menu-active-bg: #fff;
+  --shell-aside-footer-bg: rgb(255 255 255 / 65%);
 }
 
 /* 能源蓝 · 深色 */
 :root[data-brand-theme='energy-blue'][theme-mode='dark'] {
-  --td-brand-color-1: #172c40;
-  --td-brand-color-2: #183a56;
-  --td-brand-color-3: #17466b;
-  --td-brand-color-4: #145685;
-  --td-brand-color-5: #1065a2;
-  --td-brand-color-6: #1675bc;
-  --td-brand-color-7: #2e83c4;
-  --td-brand-color-8: #4a93d8;
-  --td-brand-color-9: #78b5e8;
-  --td-brand-color-10: #b3d7f5;
+  --td-brand-color-1: #132639;
+  --td-brand-color-2: #143249;
+  --td-brand-color-3: #143e5b;
+  --td-brand-color-4: #124d71;
+  --td-brand-color-5: #105d88;
+  --td-brand-color-6: #146ea0;
+  --td-brand-color-7: #2a82ba;
+  --td-brand-color-8: #4c9bcd;
+  --td-brand-color-9: #7cb9df;
+  --td-brand-color-10: #b5d6ee;
   --td-success-color-1: #17372f;
   --td-success-color-2: #19453a;
   --td-success-color-3: #195344;
@@ -99,8 +115,8 @@
   --td-success-color-8: #79cbb0;
   --td-success-color-9: #a8ddc8;
   --td-success-color-10: #d0e9de;
-  --td-bg-color-page: #0f1923;
-  --td-bg-color-container: #16242f;
+  --td-bg-color-page: #0d1620;
+  --td-bg-color-container: #14202e;
   --td-bg-color-container-hover: #1b2d3a;
   --td-bg-color-container-active: #223844;
   --td-bg-color-container-select: #1d425b;
@@ -123,20 +139,27 @@
   --td-component-stroke: #2a3d49;
   --td-border-level-2-color: #3a5260;
   --td-component-border: #3a5260;
+  --shell-aside-bg: linear-gradient(180deg, var(--td-brand-color-1) 0%, var(--td-bg-color-container) 75%);
+  --shell-header-bg: linear-gradient(90deg, var(--td-brand-color-1) 0%, var(--td-bg-color-container) 65%);
+  --shell-content-bg:
+    radial-gradient(1000px 400px at 90% -10%, rgb(42 130 186 / 10%), transparent 60%), var(--td-bg-color-page);
+  --shell-brand-mark-bg: linear-gradient(135deg, var(--td-brand-color-7), var(--td-brand-color-5));
+  --shell-menu-active-bg: var(--td-brand-color-2);
+  --shell-aside-footer-bg: var(--td-bg-color-secondarycontainer);
 }
 
-/* 电网绿 · 浅色 */
-:root[data-brand-theme='grid-green']:not([theme-mode='dark']) {
-  --td-brand-color-1: #e6f4ef;
-  --td-brand-color-2: #c9e8dd;
-  --td-brand-color-3: #98cdbd;
-  --td-brand-color-4: #62ae98;
-  --td-brand-color-5: #33967b;
-  --td-brand-color-6: #1b9277;
-  --td-brand-color-7: #007f67;
-  --td-brand-color-8: #006b58;
-  --td-brand-color-9: #005748;
-  --td-brand-color-10: #004337;
+/* 国网绿 · 浅色（深绿沉稳取向，避免鲜嫩感） */
+:root[data-brand-theme='sgcc-green']:not([theme-mode='dark']) {
+  --td-brand-color-1: #e8f2ec;
+  --td-brand-color-2: #cce3d5;
+  --td-brand-color-3: #9cc6ae;
+  --td-brand-color-4: #64a586;
+  --td-brand-color-5: #358a62;
+  --td-brand-color-6: #148052;
+  --td-brand-color-7: #00703c;
+  --td-brand-color-8: #005f34;
+  --td-brand-color-9: #004e2c;
+  --td-brand-color-10: #003b21;
   --td-success-color-1: #e7f4ed;
   --td-success-color-2: #c8e8d7;
   --td-success-color-3: #91cbae;
@@ -147,7 +170,7 @@
   --td-success-color-8: #064a35;
   --td-success-color-9: #043a2b;
   --td-success-color-10: #032c20;
-  --td-bg-color-page: #f3f8f6;
+  --td-bg-color-page: #f2f7f4;
   --td-bg-color-container: #fff;
   --td-bg-color-container-hover: #f0f6f3;
   --td-bg-color-container-active: #e1ece7;
@@ -171,20 +194,28 @@
   --td-component-stroke: #dce8e3;
   --td-border-level-2-color: #c7d9d1;
   --td-component-border: #c7d9d1;
+  /* 国网绿壳层氛围：淡绿渐变侧栏 + 白色选中胶囊，顶栏与内容区同步带品牌色。 */
+  --shell-aside-bg: linear-gradient(180deg, var(--td-brand-color-2) 0%, var(--td-brand-color-1) 38%, #fff 100%);
+  --shell-header-bg: linear-gradient(90deg, var(--td-brand-color-1) 0%, #fff 65%);
+  --shell-content-bg:
+    radial-gradient(1000px 400px at 90% -10%, rgb(0 112 60 / 7%), transparent 60%), var(--td-bg-color-page);
+  --shell-brand-mark-bg: linear-gradient(135deg, var(--td-brand-color-7), var(--td-brand-color-5));
+  --shell-menu-active-bg: #fff;
+  --shell-aside-footer-bg: rgb(255 255 255 / 65%);
 }
 
-/* 电网绿 · 深色 */
-:root[data-brand-theme='grid-green'][theme-mode='dark'] {
-  --td-brand-color-1: #15352d;
-  --td-brand-color-2: #17453a;
-  --td-brand-color-3: #175344;
-  --td-brand-color-4: #146652;
-  --td-brand-color-5: #107a61;
-  --td-brand-color-6: #118d70;
-  --td-brand-color-7: #16896b;
-  --td-brand-color-8: #2aa17f;
-  --td-brand-color-9: #58bc9a;
-  --td-brand-color-10: #a2dcc4;
+/* 国网绿 · 深色 */
+:root[data-brand-theme='sgcc-green'][theme-mode='dark'] {
+  --td-brand-color-1: #133026;
+  --td-brand-color-2: #143d2d;
+  --td-brand-color-3: #144a34;
+  --td-brand-color-4: #115c3d;
+  --td-brand-color-5: #0e7047;
+  --td-brand-color-6: #128552;
+  --td-brand-color-7: #1a8a53;
+  --td-brand-color-8: #3aa471;
+  --td-brand-color-9: #6cc396;
+  --td-brand-color-10: #abe0c6;
   --td-success-color-1: #19352a;
   --td-success-color-2: #1b4131;
   --td-success-color-3: #1b4d38;
@@ -219,6 +250,124 @@
   --td-component-stroke: #2a453c;
   --td-border-level-2-color: #3b5a4e;
   --td-component-border: #3b5a4e;
+  --shell-aside-bg: linear-gradient(180deg, var(--td-brand-color-1) 0%, var(--td-bg-color-container) 75%);
+  --shell-header-bg: linear-gradient(90deg, var(--td-brand-color-1) 0%, var(--td-bg-color-container) 65%);
+  --shell-content-bg:
+    radial-gradient(1000px 400px at 90% -10%, rgb(26 138 83 / 10%), transparent 60%), var(--td-bg-color-page);
+  --shell-brand-mark-bg: linear-gradient(135deg, var(--td-brand-color-7), var(--td-brand-color-5));
+  --shell-menu-active-bg: var(--td-brand-color-2);
+  --shell-aside-footer-bg: var(--td-bg-color-secondarycontainer);
+}
+
+/* 活力橙 · 浅色 */
+:root[data-brand-theme='vibrant-orange']:not([theme-mode='dark']) {
+  --td-brand-color-1: #fff2e6;
+  --td-brand-color-2: #ffe0c7;
+  --td-brand-color-3: #ffc49b;
+  --td-brand-color-4: #f8a46d;
+  --td-brand-color-5: #f18840;
+  --td-brand-color-6: #ef771f;
+  --td-brand-color-7: #e8620c;
+  --td-brand-color-8: #c65209;
+  --td-brand-color-9: #a44207;
+  --td-brand-color-10: #7c3205;
+  --td-success-color-1: #e7f5f0;
+  --td-success-color-2: #c8e9de;
+  --td-success-color-3: #93cdba;
+  --td-success-color-4: #55ae91;
+  --td-success-color-5: #078268;
+  --td-success-color-6: #006f59;
+  --td-success-color-7: #005d4b;
+  --td-success-color-8: #004c3e;
+  --td-success-color-9: #003b31;
+  --td-success-color-10: #002b24;
+  --td-bg-color-page: #faf6f1;
+  --td-bg-color-container: #fff;
+  --td-bg-color-container-hover: #faf3ec;
+  --td-bg-color-container-active: #f3e8dd;
+  --td-bg-color-container-select: #fff;
+  --td-bg-color-secondarycontainer: #faf3ec;
+  --td-bg-color-secondarycontainer-hover: #f4ebe2;
+  --td-bg-color-secondarycontainer-active: #ecdfd2;
+  --td-bg-color-component: #f1e7dc;
+  --td-bg-color-component-hover: #e7d9cb;
+  --td-bg-color-component-active: #d3bfac;
+  --td-bg-color-secondarycomponent: #e7d9cb;
+  --td-bg-color-secondarycomponent-hover: #dbc7b4;
+  --td-bg-color-secondarycomponent-active: #c2ab96;
+  --td-bg-color-component-disabled: #f5efe8;
+  --td-bg-color-specialcomponent: #fff;
+  --td-text-color-primary: #33261b;
+  --td-text-color-secondary: #7d6c5d;
+  --td-text-color-placeholder: #a49384;
+  --td-text-color-disabled: #c4b6a8;
+  --td-border-level-1-color: #ede2d6;
+  --td-component-stroke: #ede2d6;
+  --td-border-level-2-color: #ddcebe;
+  --td-component-border: #ddcebe;
+  /* 活力橙壳层氛围：与蓝绿主题同一套结构，保证四个品牌主题表现一致。 */
+  --shell-aside-bg: linear-gradient(180deg, var(--td-brand-color-2) 0%, var(--td-brand-color-1) 38%, #fff 100%);
+  --shell-header-bg: linear-gradient(90deg, var(--td-brand-color-1) 0%, #fff 65%);
+  --shell-content-bg:
+    radial-gradient(1000px 400px at 90% -10%, rgb(232 98 12 / 6%), transparent 60%), var(--td-bg-color-page);
+  --shell-brand-mark-bg: linear-gradient(135deg, var(--td-brand-color-7), var(--td-brand-color-5));
+  --shell-menu-active-bg: #fff;
+  --shell-aside-footer-bg: rgb(255 255 255 / 65%);
+}
+
+/* 活力橙 · 深色 */
+:root[data-brand-theme='vibrant-orange'][theme-mode='dark'] {
+  --td-brand-color-1: #3a2415;
+  --td-brand-color-2: #4a2d16;
+  --td-brand-color-3: #5a3617;
+  --td-brand-color-4: #714117;
+  --td-brand-color-5: #8d4e17;
+  --td-brand-color-6: #ad5e18;
+  --td-brand-color-7: #d9731f;
+  --td-brand-color-8: #ec8f46;
+  --td-brand-color-9: #f3b27e;
+  --td-brand-color-10: #f8d7b8;
+  --td-success-color-1: #17372f;
+  --td-success-color-2: #19453a;
+  --td-success-color-3: #195344;
+  --td-success-color-4: #136b53;
+  --td-success-color-5: #0b9370;
+  --td-success-color-6: #2aa582;
+  --td-success-color-7: #4ab897;
+  --td-success-color-8: #79cbb0;
+  --td-success-color-9: #a8ddc8;
+  --td-success-color-10: #d0e9de;
+  --td-bg-color-page: #1a1310;
+  --td-bg-color-container: #241a14;
+  --td-bg-color-container-hover: #2d2119;
+  --td-bg-color-container-active: #3a2a1e;
+  --td-bg-color-container-select: #4a2d16;
+  --td-bg-color-secondarycontainer: #2d2119;
+  --td-bg-color-secondarycontainer-hover: #3a2a1e;
+  --td-bg-color-secondarycontainer-active: #483425;
+  --td-bg-color-component: #3c2c20;
+  --td-bg-color-component-hover: #4c3828;
+  --td-bg-color-component-active: #614833;
+  --td-bg-color-secondarycomponent: #4c3828;
+  --td-bg-color-secondarycomponent-hover: #614833;
+  --td-bg-color-secondarycomponent-active: #77593f;
+  --td-bg-color-component-disabled: #2d2119;
+  --td-bg-color-specialcomponent: transparent;
+  --td-text-color-primary: #f3e9df;
+  --td-text-color-secondary: #c2ae9d;
+  --td-text-color-placeholder: #8f7a67;
+  --td-text-color-disabled: #67564a;
+  --td-border-level-1-color: #3c2c20;
+  --td-component-stroke: #3c2c20;
+  --td-border-level-2-color: #54402e;
+  --td-component-border: #54402e;
+  --shell-aside-bg: linear-gradient(180deg, var(--td-brand-color-1) 0%, var(--td-bg-color-container) 75%);
+  --shell-header-bg: linear-gradient(90deg, var(--td-brand-color-1) 0%, var(--td-bg-color-container) 65%);
+  --shell-content-bg:
+    radial-gradient(1000px 400px at 90% -10%, rgb(217 115 31 / 10%), transparent 60%), var(--td-bg-color-page);
+  --shell-brand-mark-bg: linear-gradient(135deg, var(--td-brand-color-7), var(--td-brand-color-5));
+  --shell-menu-active-bg: var(--td-brand-color-2);
+  --shell-aside-footer-bg: var(--td-bg-color-secondarycontainer);
 }
 
 html,

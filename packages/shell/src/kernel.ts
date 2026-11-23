@@ -1,6 +1,5 @@
 import { createAdminKernel } from '@kacean/core'
-import { shellManifest } from './manifest'
-import { moduleManifests } from './modules'
+import { moduleLoader } from './modules'
 import { createMockAuthProvider } from './providers/auth'
 import { createMockPermissionProvider } from './providers/permission'
 import { createTDesignLayoutProvider } from './providers/TDesignLayout'
@@ -16,7 +15,5 @@ kernel.registerProvider('permission', createMockPermissionProvider())
 kernel.registerProvider('layout', createTDesignLayoutProvider(kernel))
 // MenuProvider 使用内核默认实现（权限过滤 + order 排序），需要自定义编排时在此注册
 
-kernel.registerModule(shellManifest)
-for (const manifest of moduleManifests) {
-  kernel.registerModule(manifest)
-}
+/** 模块经清单加载器统一注册（disabled 过滤 + 依赖校验 + 拓扑排序），启动前须 await */
+export const kernelReady = kernel.loadModules(moduleLoader)

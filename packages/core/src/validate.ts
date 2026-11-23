@@ -21,6 +21,9 @@ export function validateManifest(manifest: AdminModuleManifest, registered: Admi
   if (!manifest.name) {
     throw new Error('[kacean-core] 模块缺少 name，无法注册')
   }
+  if (!manifest.version) {
+    throw new Error(`[kacean-core] 模块 ${manifest.name} 缺少 version，无法注册`)
+  }
   if (registered.some((item) => item.name === manifest.name)) {
     throw new Error(`[kacean-core] 模块名重复：${manifest.name}`)
   }

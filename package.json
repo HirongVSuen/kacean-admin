@@ -7,8 +7,14 @@
     "build:shell": "pnpm --filter shell build",
     "dev:module": "node scripts/run-module.mjs dev",
     "build:module": "node scripts/run-module.mjs build",
+    "build": "pnpm -r --if-present build",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "check:workspace": "node scripts/check-workspace.mjs",
+    "check": "pnpm check:workspace && pnpm lint && pnpm typecheck",
+    "verify": "pnpm check && pnpm build",
     "lint": "eslint . --ext .js,.cjs,.mjs,.ts,.tsx,.vue --no-error-on-unmatched-pattern",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "keywords": [],
   "author": "kacean",

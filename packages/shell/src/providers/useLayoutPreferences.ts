@@ -1,6 +1,6 @@
 import { onBeforeUnmount, onMounted, reactive, watch } from 'vue'
 
-export type BrandTheme = 'default' | 'energy-blue' | 'grid-green'
+export type BrandTheme = 'default' | 'energy-blue' | 'sgcc-green' | 'vibrant-orange'
 export type ThemeMode = 'light' | 'dark' | 'system'
 export type NavigationMode = 'side' | 'top'
 
@@ -31,9 +31,19 @@ function readPreferences(): LayoutPreferences {
     if (!parsed || typeof parsed !== 'object') return { ...defaultPreferences }
 
     const value = parsed as Partial<LayoutPreferences>
+    // 兼容旧版主题标识：深海蓝 → 能源蓝，电网绿 → 国网绿。
+    const legacyBrandTheme = value.brandTheme as string | undefined
+    const brandTheme =
+      legacyBrandTheme === 'deep-blue'
+        ? 'energy-blue'
+        : legacyBrandTheme === 'grid-green'
+          ? 'sgcc-green'
+          : legacyBrandTheme
     return {
       brandTheme:
-        value.brandTheme === 'energy-blue' || value.brandTheme === 'grid-green' ? value.brandTheme : 'default',
+        brandTheme === 'energy-blue' || brandTheme === 'sgcc-green' || brandTheme === 'vibrant-orange'
+          ? brandTheme
+          : 'default',
       theme: value.theme === 'dark' || value.theme === 'system' ? value.theme : 'light',
       navigation: value.navigation === 'top' ? 'top' : 'side',
       contentOnly: value.contentOnly === true
