@@ -1,6 +1,6 @@
 import type { InjectionKey } from 'vue'
 import type { ApiResponse } from '@kacean/types'
-import { isSuccessResponse } from './response'
+import { SUCCESS_CODE, isSuccessResponse } from './response'
 
 /** 网络层错误码（fetch  reject 且非超时/取消） */
 export const HTTP_NETWORK_ERROR_CODE = 'NETWORK_ERROR'
@@ -8,7 +8,7 @@ export const HTTP_NETWORK_ERROR_CODE = 'NETWORK_ERROR'
 export const HTTP_TIMEOUT_ERROR_CODE = 'TIMEOUT'
 /** 请求被外部 signal 取消的错误码 */
 export const HTTP_ABORTED_ERROR_CODE = 'ABORTED'
-/** 响应不是合法 ApiResponse（非 JSON 或缺少 code）的错误码 */
+/** 响应不是合法 JSON，或 Result 模式缺少 code 的错误码 */
 export const HTTP_INVALID_RESPONSE_CODE = 'INVALID_RESPONSE'
 
 /**
@@ -81,19 +81,32 @@ export interface HttpClientConfig {
 /** 可覆盖的 client 配置（baseURL 由工厂 create 时单独传入） */
 export type HttpClientOverrides = Partial<Omit<HttpClientConfig, 'baseURL'>>
 
+export interface HttpDataRequestOptions extends HttpRequestOptions {
+  /**
+   * 默认 result 要求 ApiResponse；raw 直接返回原始 JSON；auto 显式兼容有无 ApiResponse 包装。
+   * auto 遇到 ApiResponse 时仍校验业务码，空响应返回 null。
+   */
+  responseFormat?: 'result' | 'raw' | 'auto'
+  /** 自定义 JSON 解析器，可在 raw 模式保留 int64 ID 等精度；解析失败按 INVALID_RESPONSE 处理。 */
+  parseJson?: (text: string) => unknown
+}
+
 export interface HttpClient {
   /**
    * 返回完整 ApiResponse：不拆包、不抛业务错误（HTTP/网络层错误仍抛 HttpError）。
    * 适用于需要读取完整响应的场景，如 VALIDATION_ERROR 的错误详情。
    */
   requestResult<T>(path: string, options?: HttpRequestOptions): Promise<ApiResponse<T>>
-  /** 业务成功返回 data（后端无数据时为 null）；业务失败抛 HttpError（code 为后端业务错误码） */
-  request<T>(path: string, options?: HttpRequestOptions): Promise<T | null>
-  get<T>(path: string, options?: HttpRequestOptions): Promise<T | null>
-  delete<T>(path: string, options?: HttpRequestOptions): Promise<T | null>
-  post<T>(path: string, body?: unknown, options?: HttpRequestOptions): Promise<T | null>
-  put<T>(path: string, body?: unknown, options?: HttpRequestOptions): Promise<T | null>
-  patch<T>(path: string, body?: unknown, options?: HttpRequestOptions): Promise<T | null>
+  /**
+   * 默认拆包 ApiResponse.data，业务失败抛 HttpError；raw 返回原始 JSON，auto 显式兼容有无包装。
+   * 后端无数据或空响应时为 null。
+   */
+  request<T>(path: string, options?: HttpDataRequestOptions): Promise<T | null>
+  get<T>(path: string, options?: HttpDataRequestOptions): Promise<T | null>
+  delete<T>(path: string, options?: HttpDataRequestOptions): Promise<T | null>
+  post<T>(path: string, body?: unknown, options?: HttpDataRequestOptions): Promise<T | null>
+  put<T>(path: string, body?: unknown, options?: HttpDataRequestOptions): Promise<T | null>
+  patch<T>(path: string, body?: unknown, options?: HttpDataRequestOptions): Promise<T | null>
 }
 
 /** 工厂配置：client 公共配置 + 逻辑服务目录 */
@@ -162,7 +175,7 @@ function isRawBody(body: unknown): body is BodyInit {
 export function createHttpClient(config: HttpClientConfig): HttpClient {
   const fetcher = config.fetcher ?? globalThis.fetch.bind(globalThis)
 
-  async function requestResult<T>(path: string, options: HttpRequestOptions = {}): Promise<ApiResponse<T>> {
+  async function executeRequest<T>(path: string, options: HttpDataRequestOptions = {}): Promise<ApiResponse<T>> {
     const method = options.method ?? 'GET'
     const url = resolveUrl(config.baseURL, path, options.params)
 
@@ -208,10 +221,10 @@ export function createHttpClient(config: HttpClientConfig): HttpClient {
       if (response.status === 401) config.auth?.onUnauthorized?.()
 
       const text = await response.text()
-      let payload: ApiResponse<T> | null = null
+      let payload: unknown = null
       if (text) {
         try {
-          payload = JSON.parse(text) as ApiResponse<T>
+          payload = options.parseJson ? options.parseJson(text) : JSON.parse(text)
         } catch (cause) {
           throw new HttpError<T>('响应不是合法 JSON', {
             code: HTTP_INVALID_RESPONSE_CODE,
@@ -220,20 +233,26 @@ export function createHttpClient(config: HttpClientConfig): HttpClient {
           })
         }
       }
+      const result = payload as ApiResponse<T> | null
       if (!response.ok) {
-        throw new HttpError<T>(payload?.message || `HTTP ${response.status}`, {
+        throw new HttpError<T>(result?.message || `HTTP ${response.status}`, {
           code: `HTTP_${response.status}`,
           status: response.status,
-          data: payload?.data ?? null
+          data: result?.data ?? null
         })
       }
-      if (!payload || typeof payload.code !== 'string') {
+      const isApiResponse = !!result && typeof result.code === 'string'
+      // raw / auto 仅在调用方显式声明时启用；公共 requestResult 仍只接受 Result。
+      if (options.responseFormat === 'raw' || (options.responseFormat === 'auto' && !isApiResponse)) {
+        return { code: SUCCESS_CODE, message: 'OK', data: (payload ?? null) as T | null }
+      }
+      if (!isApiResponse) {
         throw new HttpError<T>('响应不符合 ApiResponse 契约（缺少 code）', {
           code: HTTP_INVALID_RESPONSE_CODE,
           status: response.status
         })
       }
-      return payload
+      return result
     } catch (error) {
       if (error instanceof HttpError) throw error
       if (timedOut) {
@@ -249,8 +268,12 @@ export function createHttpClient(config: HttpClientConfig): HttpClient {
     }
   }
 
-  async function request<T>(path: string, options?: HttpRequestOptions): Promise<T | null> {
-    const result = await requestResult<T>(path, options)
+  async function requestResult<T>(path: string, options: HttpRequestOptions = {}): Promise<ApiResponse<T>> {
+    return executeRequest<T>(path, options)
+  }
+
+  async function request<T>(path: string, options: HttpDataRequestOptions = {}): Promise<T | null> {
+    const result = await executeRequest<T>(path, options)
     if (!isSuccessResponse(result)) {
       throw new HttpError<T>(result.message, { code: result.code, data: result.data })
     }
@@ -260,13 +283,13 @@ export function createHttpClient(config: HttpClientConfig): HttpClient {
   return {
     requestResult,
     request,
-    get: <T>(path: string, options?: HttpRequestOptions) => request<T>(path, { ...options, method: 'GET' }),
-    delete: <T>(path: string, options?: HttpRequestOptions) => request<T>(path, { ...options, method: 'DELETE' }),
-    post: <T>(path: string, body?: unknown, options?: HttpRequestOptions) =>
+    get: <T>(path: string, options?: HttpDataRequestOptions) => request<T>(path, { ...options, method: 'GET' }),
+    delete: <T>(path: string, options?: HttpDataRequestOptions) => request<T>(path, { ...options, method: 'DELETE' }),
+    post: <T>(path: string, body?: unknown, options?: HttpDataRequestOptions) =>
       request<T>(path, { ...options, method: 'POST', body }),
-    put: <T>(path: string, body?: unknown, options?: HttpRequestOptions) =>
+    put: <T>(path: string, body?: unknown, options?: HttpDataRequestOptions) =>
       request<T>(path, { ...options, method: 'PUT', body }),
-    patch: <T>(path: string, body?: unknown, options?: HttpRequestOptions) =>
+    patch: <T>(path: string, body?: unknown, options?: HttpDataRequestOptions) =>
       request<T>(path, { ...options, method: 'PATCH', body })
   }
 }

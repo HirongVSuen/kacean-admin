@@ -59,7 +59,140 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
 
+  packages/modules/account-management:
+    dependencies:
+      '@kacean/common':
+        specifier: workspace:*
+        version: link:../../common
+      '@kacean/shared':
+        specifier: workspace:*
+        version: link:../../shared-components
+      '@kacean/types':
+        specifier: workspace:*
+        version: link:../../admin-module-types
+      tdesign-vue-next:
+        specifier: ^1.20.11
+        version: 1.20.11(vue@3.5.45(typescript@6.0.3))
+      vue:
+        specifier: ^3.5.13
+        version: 3.5.45(typescript@6.0.3)
+    devDependencies:
+      '@vitejs/plugin-vue':
+        specifier: ^5.2.1
+        version: 5.2.4(vite@5.4.21)(vue@3.5.45(typescript@6.0.3))
+      '@vitejs/plugin-vue-jsx':
+        specifier: ^5.1.6
+        version: 5.1.6(vite@5.4.21)(vue@3.5.45(typescript@6.0.3))
+      unocss:
+        specifier: ^66.13.0
+        version: 66.13.0(@oxc-project/types@0.153.0)(cac@7.1.0)(rollup@4.68.7)(srvx@1.0.8)(vite@5.4.21)
+      vite:
+        specifier: ^5.4.11
+        version: 5.4.21
+      vue-tsc:
+        specifier: ^3.3.14
+        version: 3.3.14(typescript@6.0.3)
+
+  packages/modules/data-dict-management:
+    dependencies:
+      '@kacean/common':
+        specifier: workspace:*
+        version: link:../../common
+      '@kacean/shared':
+        specifier: workspace:*
+        version: link:../../shared-components
+      '@kacean/types':
+        specifier: workspace:*
+        version: link:../../admin-module-types
+      tdesign-vue-next:
+        specifier: ^1.20.11
+        version: 1.20.11(vue@3.5.45(typescript@6.0.3))
+      vue:
+        specifier: ^3.5.13
+        version: 3.5.45(typescript@6.0.3)
+    devDependencies:
+      '@vitejs/plugin-vue':
+        specifier: ^5.2.1
+        version: 5.2.4(vite@5.4.21)(vue@3.5.45(typescript@6.0.3))
+      '@vitejs/plugin-vue-jsx':
+        specifier: ^5.1.6
+        version: 5.1.6(vite@5.4.21)(vue@3.5.45(typescript@6.0.3))
+      unocss:
+        specifier: ^66.13.0
+        version: 66.13.0(@oxc-project/types@0.153.0)(cac@7.1.0)(rollup@4.68.7)(srvx@1.0.8)(vite@5.4.21)
+      vite:
+        specifier: ^5.4.11
+        version: 5.4.21
+      vue-tsc:
+        specifier: ^3.3.14
+        version: 3.3.14(typescript@6.0.3)
+
+  packages/modules/menu-management:
+    dependencies:
+      '@kacean/shared':
+        specifier: workspace:*
+        version: link:../../shared-components
+      '@kacean/types':
+        specifier: workspace:*
+        version: link:../../admin-module-types
+      tdesign-vue-next:
+        specifier: ^1.20.11
+        version: 1.20.11(vue@3.5.45(typescript@6.0.3))
+      vue:
+        specifier: ^3.5.13
+        version: 3.5.45(typescript@6.0.3)
+    devDependencies:
+      '@vitejs/plugin-vue':
+        specifier: ^5.2.1
+        version: 5.2.4(vite@5.4.21)(vue@3.5.45(typescript@6.0.3))
+      '@vitejs/plugin-vue-jsx':
+        specifier: ^5.1.6
+        version: 5.1.6(vite@5.4.21)(vue@3.5.45(typescript@6.0.3))
+      unocss:
+        specifier: ^66.13.0
+        version: 66.13.0(@oxc-project/types@0.153.0)(cac@7.1.0)(rollup@4.68.7)(srvx@1.0.8)(vite@5.4.21)
+      vite:
+        specifier: ^5.4.11
+        version: 5.4.21
+      vue-tsc:
+        specifier: ^3.3.14
+        version: 3.3.14(typescript@6.0.3)
+
   packages/modules/template-module:
+    dependencies:
+      '@kacean/common':
+        specifier: workspace:*
+        version: link:../../common
+      '@kacean/shared':
+        specifier: workspace:*
+        version: link:../../shared-components
+      '@kacean/types':
+        specifier: workspace:*
+        version: link:../../admin-module-types
+      tdesign-vue-next:
+        specifier: ^1.20.11
+        version: 1.20.11(vue@3.5.45(typescript@6.0.3))
+      vue:
+        specifier: ^3.5.13
+        version: 3.5.45(typescript@6.0.3)
+    devDependencies:
+      '@vitejs/plugin-vue':
+        specifier: ^5.2.1
+        version: 5.2.4(vite@5.4.21)(vue@3.5.45(typescript@6.0.3))
+      '@vitejs/plugin-vue-jsx':
+        specifier: ^5.1.6
+        version: 5.1.6(vite@5.4.21)(vue@3.5.45(typescript@6.0.3))
+      unocss:
+        specifier: ^66.13.0
+        version: 66.13.0(@oxc-project/types@0.153.0)(cac@7.1.0)(rollup@4.68.7)(srvx@1.0.8)(vite@5.4.21)
+      vite:
+        specifier: ^5.4.11
+        version: 5.4.21
+      vue-tsc:
+        specifier: ^3.3.14
+        version: 3.3.14(typescript@6.0.3)
+
+  packages/modules/two-ticket-management:
     dependencies:
       '@kacean/common':
         specifier: workspace:*
@@ -116,12 +249,24 @@ importers:
       '@kacean/types':
         specifier: workspace:*
         version: link:../admin-module-types
+      account-management:
+        specifier: workspace:*
+        version: link:../modules/account-management
+      data-dict-management:
+        specifier: workspace:*
+        version: link:../modules/data-dict-management
+      menu-management:
+        specifier: workspace:*
+        version: link:../modules/menu-management
       tdesign-vue-next:
         specifier: ^1.20.11
         version: 1.20.11(vue@3.5.45(typescript@6.0.3))
       template-module:
         specifier: workspace:*
         version: link:../modules/template-module
+      two-ticket-management:
+        specifier: workspace:*
+        version: link:../modules/two-ticket-management
       vue:
         specifier: ^3.5.13
         version: 3.5.45(typescript@6.0.3)

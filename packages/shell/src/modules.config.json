@@ -1,4 +1,7 @@
 [
-  { "id": "shell", "order": 0 },
-  { "id": "template-module", "order": 20 }
+  { "id": "two-ticket-management", "order": 10 },
+  { "id": "template-module", "order": 20 },
+  { "id": "account-management", "order": 30 },
+  { "id": "data-dict-management", "order": 35 },
+  { "id": "menu-management", "order": 40 }
 ]

@@ -1,0 +1,116 @@
+.two-ticket-management__ticket-cell {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.two-ticket-management__ticket-cell strong {
+  overflow: hidden;
+  color: var(--td-text-color-primary);
+  font-size: 13px;
+  font-weight: 550;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.two-ticket-management__ticket-cell span {
+  color: var(--td-text-color-secondary);
+  font-size: 12px;
+}
+
+.two-ticket-management__search {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(130px, 170px) minmax(130px, 170px) auto;
+  gap: 12px;
+}
+
+.two-ticket-management__search-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.ticket-type-management__search {
+  display: grid;
+  grid-template-columns: minmax(240px, 1fr) auto auto;
+  gap: 12px;
+  align-items: center;
+}
+
+.ticket-type-management__search-actions,
+.ticket-type-management__operations {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.ticket-type-management__operations {
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.ticket-type-management__error {
+  margin-top: 12px;
+}
+
+.two-ticket-management-dev__nav {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.two-ticket-management-dev {
+  display: flex;
+  height: 100dvh;
+  min-height: 0;
+  box-sizing: border-box;
+  flex-direction: column;
+  padding: 24px;
+  overflow: hidden;
+  background: var(--td-bg-color-page);
+}
+
+.two-ticket-management-dev__header {
+  flex: none;
+  margin-bottom: 20px;
+}
+
+.two-ticket-management-dev__header h1 {
+  margin: 0 0 8px;
+  color: var(--td-text-color-primary);
+  font-size: 22px;
+}
+
+.two-ticket-management-dev__header p {
+  margin: 0;
+  color: var(--td-text-color-secondary);
+}
+
+.two-ticket-management-dev__content {
+  flex: 1;
+  min-height: 0;
+}
+
+@media (max-width: 960px) {
+  .two-ticket-management__search {
+    grid-template-columns: minmax(0, 1fr) minmax(140px, 0.5fr);
+  }
+
+  .two-ticket-management__search-actions {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 760px) {
+  .ticket-type-management__search {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ticket-type-management__search-actions {
+    flex-wrap: wrap;
+  }
+
+  .two-ticket-management-dev {
+    padding: 18px;
+  }
+}

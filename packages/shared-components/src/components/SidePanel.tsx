@@ -66,6 +66,8 @@ export const SidePanel = defineComponent({
     width: { type: Number, default: 360 },
     title: { type: String, default: '' },
     mode: { type: String as PropType<'dock' | 'overlay'>, default: 'dock' },
+    /** 是否显示关闭按钮 */
+    showClose: { type: Boolean, default: true },
     /** 是否显示收缩按钮 */
     showCollapse: { type: Boolean, default: true },
     /** Esc 关闭；捕获阶段拦截，避免误触发宿主的 Esc 快捷键 */
@@ -152,14 +154,16 @@ export const SidePanel = defineComponent({
                             <CollapseIcon />
                           </button>
                         )}
-                        <button
-                          type="button"
-                          class="kacean-side-panel__icon-button"
-                          aria-label="关闭面板"
-                          onClick={() => emit('close')}
-                        >
-                          <CloseIcon />
-                        </button>
+                        {props.showClose && (
+                          <button
+                            type="button"
+                            class="kacean-side-panel__icon-button"
+                            aria-label="关闭面板"
+                            onClick={() => emit('close')}
+                          >
+                            <CloseIcon />
+                          </button>
+                        )}
                       </div>
                     </header>
 

@@ -53,6 +53,89 @@
   gap: 20px;
 }
 
+.kacean-paginated-table__table {
+  min-width: 0;
+}
+
+.kacean-paginated-table--fill {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.kacean-paginated-table--fill > .kacean-paginated-table__table {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.kacean-paginated-table--fill .kacean-data-table,
+.kacean-paginated-table--fill .kacean-data-table > .t-table {
+  height: 100%;
+  min-height: 0;
+}
+
+.kacean-paginated-table--fill .kacean-data-table {
+  overflow: hidden;
+}
+
+.kacean-paginated-table--fill .kacean-data-table > .t-table > .t-table__content {
+  overscroll-behavior: contain;
+}
+
+.kacean-paginated-table--fill > .kacean-pagination-bar {
+  flex: none;
+}
+
+/* 数据列表页占满宿主提供的可用高度，页头、查询条件区与底部分页固定，仅表格内容区纵向滚动。 */
+.kacean-data-table-template {
+  display: flex;
+  height: 100%;
+  min-height: 0;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.kacean-data-table-template > .page-header {
+  flex: none;
+}
+
+.kacean-data-table-template > .kacean-page__content {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.kacean-data-table-template__search {
+  flex: none;
+}
+
+.kacean-data-table-template__card {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Card body 外有 TDesign Loading 包装层，两层都必须参与 flex 高度约束。 */
+.kacean-data-table-template__card > .t-loading__parent {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.kacean-data-table-template__card > .t-card__body,
+.kacean-data-table-template__card > .t-loading__parent > .t-card__body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+  overflow: hidden;
+}
+
 .kacean-tree {
   width: 100%;
   min-width: 0;
@@ -289,6 +372,9 @@
   position: relative;
   align-self: stretch;
   min-height: 0;
+  overflow: hidden;
+  border: 1px solid var(--td-component-stroke);
+  border-radius: var(--td-radius-extraLarge);
 }
 
 .kacean-side-panel--overlay {

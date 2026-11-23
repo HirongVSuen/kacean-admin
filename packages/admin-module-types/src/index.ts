@@ -104,10 +104,11 @@ export interface AdminModuleManifest {
   deps?: Record<string, string>
   /** 默认是否停用；清单描述（ModuleDescriptor.disabled）可覆盖。停用的模块不注册、不参与聚合 */
   disabled?: boolean
-  /** 模块申报的权限码清单，供权限系统分配与注册时契约校验使用 */
+  /** 静态菜单申报的权限码清单；动态菜单与用户权限由宿主 Provider 管理 */
   permissions?: string[]
-  menus: ModuleMenuItem[]
-  /** 模块路由表，与 menus 同源：菜单 path 应有对应路由 */
+  /** 可选静态菜单；真实业务模块可只提供 routes，由宿主 MenuProvider 提供动态菜单 */
+  menus?: ModuleMenuItem[]
+  /** 模块路由表；静态菜单的叶子 path 应有对应路由 */
   routes: ModuleRoute[]
 }
 

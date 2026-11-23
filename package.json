@@ -4,7 +4,10 @@
   "description": "",
   "scripts": {
     "dev:shell": "pnpm --filter shell dev",
+    "dev:shell:integration": "pnpm --filter shell dev:integration",
     "build:shell": "pnpm --filter shell build",
+    "build:static": "pnpm -r --if-present build:static",
+    "build:integration": "pnpm -r --if-present build:integration",
     "dev:module": "node scripts/run-module.mjs dev",
     "build:module": "node scripts/run-module.mjs build",
     "build": "pnpm -r --if-present build",

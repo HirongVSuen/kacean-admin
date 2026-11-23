@@ -6,13 +6,13 @@ import './styles/theme.css'
 import 'virtual:uno.css'
 import { HTTP_CLIENT_FACTORY_KEY } from '@kacean/common'
 import App from './App'
-import { kernelReady } from './kernel'
+import { shellReady } from './kernel'
 import { httpClientFactory } from './providers/http'
 import { createShellRouter } from './router'
 
 async function bootstrap() {
-  // 等待模块清单加载与注册编排完成，再创建路由、挂载应用
-  await kernelReady
+  // 等待模块注册与菜单初始化完成，再创建路由、挂载应用
+  await shellReady
   createApp(App)
     .use(createShellRouter())
     // 统一注入 HttpClient 工厂：模块按逻辑服务 key 创建 client，鉴权空实现见 providers/http.ts
@@ -21,5 +21,5 @@ async function bootstrap() {
 }
 
 bootstrap().catch((error: unknown) => {
-  console.error('[shell] 启动失败：模块清单加载或契约校验未通过', error)
+  console.error('[shell] 启动失败：模块、菜单或权限初始化未通过', error)
 })

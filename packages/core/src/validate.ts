@@ -39,10 +39,10 @@ export function validateManifest(manifest: AdminModuleManifest, registered: Admi
 
   const registeredMenuPaths = new Set<string>()
   for (const item of registered) {
-    walkMenus(item.menus, (menu) => registeredMenuPaths.add(menu.path))
+    walkMenus(item.menus ?? [], (menu) => registeredMenuPaths.add(menu.path))
   }
   const menuPaths = new Set<string>()
-  walkMenus(manifest.menus, (menu, isLeaf) => {
+  walkMenus(manifest.menus ?? [], (menu, isLeaf) => {
     if (menuPaths.has(menu.path) || registeredMenuPaths.has(menu.path)) {
       throw new Error(`[kacean-core] 菜单 path 重复：${menu.path}（模块 ${manifest.name}）`)
     }

@@ -13,6 +13,8 @@ export type PaginatedTableProps = Omit<TdPrimaryTableProps, 'data' | 'columns' |
   pageSizeOptions?: TdPaginationProps['pageSizeOptions']
   showJumper?: boolean
   showPageSize?: boolean
+  /** 占满父容器剩余高度，并自动将滚动限制在表格内容区。 */
+  fillHeight?: boolean
   onPageChange?: (pageInfo: PageInfo) => void
 }
 
@@ -33,20 +35,24 @@ export const PaginatedTable = defineComponent({
       default: () => [10, 20, 50]
     },
     showJumper: { type: Boolean, default: true },
-    showPageSize: { type: Boolean, default: true }
+    showPageSize: { type: Boolean, default: true },
+    fillHeight: { type: Boolean, default: false }
   },
   emits: ['pageChange', 'selectChange'],
   setup(props, { attrs, emit }) {
     return () => (
-      <div class="kacean-paginated-table">
-        <DataTable
-          {...attrs}
-          rowKey={props.rowKey}
-          data={props.data}
-          columns={props.columns}
-          selectedRowKeys={props.selectedRowKeys}
-          onSelectChange={(keys: Array<string | number>) => emit('selectChange', keys)}
-        />
+      <div class={['kacean-paginated-table', { 'kacean-paginated-table--fill': props.fillHeight }]}>
+        <div class="kacean-paginated-table__table">
+          <DataTable
+            {...attrs}
+            {...(props.fillHeight ? { height: '100%' } : {})}
+            rowKey={props.rowKey}
+            data={props.data}
+            columns={props.columns}
+            selectedRowKeys={props.selectedRowKeys}
+            onSelectChange={(keys: Array<string | number>) => emit('selectChange', keys)}
+          />
+        </div>
         <PaginationBar
           align="right"
           total={props.total}

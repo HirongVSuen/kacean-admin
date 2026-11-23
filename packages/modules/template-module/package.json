@@ -10,6 +10,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build && node scripts/emit-remote-meta.mjs",
+    "build:static": "vite build --mode static && node scripts/emit-remote-meta.mjs",
     "preview": "vite preview",
     "typecheck": "vue-tsc --noEmit -p tsconfig.json"
   },

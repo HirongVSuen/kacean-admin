@@ -374,6 +374,15 @@
   margin: 0 auto;
 }
 
+/* 数据表格模板接管内容区高度，兼容业务模块包装层；main 不滚动，仅表格内容区滚动。 */
+.admin-content:has(> .admin-content__inner .kacean-data-table-template) {
+  overflow: hidden;
+}
+
+.admin-content:has(> .admin-content__inner .kacean-data-table-template) > .admin-content__inner {
+  height: 100%;
+}
+
 /* 沉浸模式只隐藏导航与顶栏，内容区保留正常内边距，避免贴边。 */
 .admin-shell.is-content-only .admin-content__inner {
   max-width: none;

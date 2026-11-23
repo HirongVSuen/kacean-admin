@@ -14,13 +14,13 @@ function normalizeMenus(menus: ModuleMenuItem[], ctx: KernelContext): ModuleMenu
     .sort((a, b) => (a.order ?? DEFAULT_ORDER) - (b.order ?? DEFAULT_ORDER))
 }
 
-/** 默认 MenuProvider：聚合各模块菜单 → PermissionProvider 过滤 → order 稳定排序 */
-export function createDefaultMenuProvider(): MenuProvider {
+/**
+ * 默认 MenuProvider：聚合模块静态菜单与宿主外部菜单 → PermissionProvider 过滤 → order 稳定排序。
+ * 外部菜单来源保持同步；需要接口数据时，由宿主在调用 getMenus() 前预取并缓存。
+ */
+export function createDefaultMenuProvider(getExternalMenus: () => ModuleMenuItem[] = () => []): MenuProvider {
   return {
     resolve: (manifests: AdminModuleManifest[], ctx: KernelContext) =>
-      normalizeMenus(
-        manifests.flatMap((manifest) => manifest.menus),
-        ctx
-      )
+      normalizeMenus([...manifests.flatMap((manifest) => manifest.menus ?? []), ...getExternalMenus()], ctx)
   }
 }

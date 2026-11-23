@@ -1,11 +1,11 @@
 import type { PermissionProvider } from '@kacean/types'
 
-/** 当前用户持有的权限码，'*' 表示全部权限；mock 数据，后续改由登录接口下发 */
-const grantedPermissions = new Set(['*'])
-
-/** mock PermissionProvider：按权限码集合判断，支持 '*' 通配 */
-export function createMockPermissionProvider(): PermissionProvider {
+/**
+ * 默认 PermissionProvider：全部放行，保证纯静态模式与当前 integration 降级可用。
+ * 后续联调时在启动阶段获取并缓存用户权限码，再在这里按权限码判断。
+ */
+export function createDefaultPermissionProvider(): PermissionProvider {
   return {
-    hasPermission: (permission) => grantedPermissions.has('*') || grantedPermissions.has(permission)
+    hasPermission: () => true
   }
 }

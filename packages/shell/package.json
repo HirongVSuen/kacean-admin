@@ -5,7 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:integration": "vite --mode integration",
     "build": "vite build",
+    "build:static": "vite build --mode static",
+    "build:integration": "vite build --mode integration",
     "preview": "vite preview",
     "typecheck": "vue-tsc --noEmit -p tsconfig.json"
   },
@@ -14,7 +17,11 @@
     "@kacean/core": "workspace:*",
     "@kacean/shared": "workspace:*",
     "@kacean/types": "workspace:*",
+    "account-management": "workspace:*",
+    "data-dict-management": "workspace:*",
+    "menu-management": "workspace:*",
     "template-module": "workspace:*",
+    "two-ticket-management": "workspace:*",
     "tdesign-vue-next": "^1.20.11",
     "vue": "^3.5.13",
     "vue-router": "^4.6.5"

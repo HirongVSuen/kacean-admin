@@ -41,11 +41,7 @@ export const DEV_SERVICE_BASE_URLS: Record<ModuleService, string> = {
 
 ```ts
 import { inject } from 'vue'
-import {
-  HTTP_CLIENT_FACTORY_KEY,
-  createHttpClientFactory,
-  type HttpClient
-} from '@kacean/common'
+import { HTTP_CLIENT_FACTORY_KEY, createHttpClientFactory, type HttpClient } from '@kacean/common'
 import { DEV_SERVICE_BASE_URLS, type ModuleService } from './services'
 
 /** 降级工厂：模块独立开发 / 无头宿主未注入时使用开发默认目录 */
@@ -63,7 +59,7 @@ export function useServiceClient(service: ModuleService): HttpClient {
 
 ### 3. 定义接口层（`src/api/<资源>.ts`）
 
-响应契约对齐后端：`ApiResponse<T>` 对应 `Result<T>`（成功码 `'0'`），分页对应 `PageQuery<Q>` / `PageResult<T>`，见 `@kacean/types`。
+默认响应契约对齐后端：`ApiResponse<T>` 对应 `Result<T>`（成功码 `'0'`），分页对应 `PageQuery<Q>` / `PageResult<T>`，见 `@kacean/types`。确认控制器实际直接返回未包裹 JSON 时，才显式使用 `responseFormat: 'raw'`，不要让 common 自动兼容缺失 `code` 的响应。
 
 ```ts
 import type { HttpClient } from '@kacean/common'
@@ -91,6 +87,14 @@ export function createTemplateApi(client: HttpClient) {
 
 export type TemplateApi = ReturnType<typeof createTemplateApi>
 ```
+
+未包裹 JSON 的调用方式：
+
+```ts
+client.post<Dto[]>('/listByQuery', query, { responseFormat: 'raw', signal })
+```
+
+raw 模式仍会处理 HTTP 错误、超时、取消和非 JSON 错误，但不执行 `Result.code` 校验。只有已确认不同部署的同一接口存在有无 `Result` 包装差异时，才显式使用 `responseFormat: 'auto'`：识别到 `ApiResponse` 时仍校验业务码，否则按未包裹 JSON 处理；不要用 auto 代替契约确认。后端 JSON 将 `int64` 输出为 number 时，通过 `parseJson` 在 `JSON.parse` 前把 ID 转为字符串，避免超过 `Number.MAX_SAFE_INTEGER` 后更新/删除使用错误主键；不要直接把雪花 ID 当 `number`。
 
 ### 4. 视图中使用
 

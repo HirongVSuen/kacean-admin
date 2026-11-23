@@ -24,6 +24,7 @@ export const AppDrawer = defineComponent({
     title: { type: String, default: '' },
     header: { type: String, default: '' },
     footer: { type: Boolean, default: true },
+    showClose: { type: Boolean, default: true },
     showCollapse: { type: Boolean, default: false },
     /** 是否显示遮罩；false 时为无遮罩抽屉，面板外区域保持可交互 */
     mask: { type: Boolean, default: true },
@@ -45,6 +46,7 @@ export const AppDrawer = defineComponent({
         title={props.header || props.title}
         mode="overlay"
         mask={props.mask}
+        showClose={props.showClose}
         showCollapse={props.showCollapse}
         closeOnEsc={props.closeOnEsc}
         closeOnOverlayClick={props.closeOnOverlayClick}
