@@ -2,10 +2,10 @@ import { computed, defineComponent, nextTick, onBeforeUnmount, onMounted, reacti
 import { Alert, Button, Form, FormItem, MessagePlugin, Tag } from 'tdesign-vue-next'
 import type { FormInstanceFunctions, FormRules, PageInfo, PrimaryTableCol } from 'tdesign-vue-next'
 import { HTTP_ABORTED_ERROR_CODE, HttpError } from '@kacean/common'
-import { AppDialog, ConfirmDialog, DataTableTemplate, FormGrid, FormInput, FormSelect } from '@kacean/shared'
+import { AppDialog, ConfirmDialog, DataTableTemplate, FormGrid, FormInput, FormSelect } from '@kacean/ui'
 import { createLoginAccountApi } from '../api/loginAccount'
 import type { LoginAccountPayload, LoginAccountRecord } from '../api/loginAccount'
-import { useServiceClient } from '../api/http'
+import { http } from '../index'
 
 interface AccountFormData {
   loginAccount: string
@@ -33,7 +33,7 @@ function errorMessage(action: string, error: unknown) {
 export default defineComponent({
   name: 'AccountManagement',
   setup() {
-    const api = createLoginAccountApi(useServiceClient('two-ticket'))
+    const api = createLoginAccountApi(http())
     const rows = ref<LoginAccountRecord[]>([])
     const current = ref(1)
     const pageSize = ref(10)

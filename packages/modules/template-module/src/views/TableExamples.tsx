@@ -1,5 +1,5 @@
 import { defineComponent, ref } from 'vue'
-import { DataTable, PageContainer, SectionCard } from '@kacean/shared'
+import { DataTable, PageContainer, SectionCard } from '@kacean/ui'
 import { createProjectColumns } from '../config/projectColumns'
 import { projectRows } from '../data/projects'
 

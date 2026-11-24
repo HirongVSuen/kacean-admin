@@ -1,7 +1,7 @@
 import { computed, defineComponent, ref } from 'vue'
 import { Button } from 'tdesign-vue-next'
 import type { PageInfo, TableSort } from 'tdesign-vue-next'
-import { DataTableTemplate, FormInput, FormSelect } from '@kacean/shared'
+import { DataTableTemplate, FormInput, FormSelect } from '@kacean/ui'
 import { createProjectColumns } from '../config/projectColumns'
 import { projectRows } from '../data/projects'
 import type { ProjectRecord, ProjectStatus } from '../data/projects'

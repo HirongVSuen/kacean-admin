@@ -2,10 +2,10 @@ import { computed, defineComponent, nextTick, onBeforeUnmount, onMounted, reacti
 import { Alert, Button, Form, FormItem, MessagePlugin, Tag } from 'tdesign-vue-next'
 import type { FormInstanceFunctions, FormRules, PageInfo, PrimaryTableCol } from 'tdesign-vue-next'
 import { HTTP_ABORTED_ERROR_CODE, HttpError } from '@kacean/common'
-import { AppDialog, ConfirmDialog, DataTableTemplate, FormGrid, FormInput, FormSelect, SidePanel } from '@kacean/shared'
+import { AppDialog, ConfirmDialog, DataTableTemplate, FormGrid, FormInput, FormSelect, SidePanel } from '@kacean/ui'
 import { createDataDictApi } from '../api/dataDict'
 import type { DataDictPayload, DataDictRecord } from '../api/dataDict'
-import { useServiceClient } from '../api/http'
+import { http } from '../index'
 import DictValuePanel from './DictValuePanel'
 
 interface DictFormData {
@@ -33,7 +33,7 @@ function errorMessage(action: string, error: unknown) {
 export default defineComponent({
   name: 'DataDictManagement',
   setup() {
-    const api = createDataDictApi(useServiceClient('two-ticket'))
+    const api = createDataDictApi(http())
     const rows = ref<DataDictRecord[]>([])
     const keyword = ref('')
     const appliedKeyword = ref('')

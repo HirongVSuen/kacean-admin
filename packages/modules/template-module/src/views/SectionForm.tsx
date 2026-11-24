@@ -14,7 +14,7 @@ import {
   FormUpload,
   PageContainer,
   SectionCard
-} from '@kacean/shared'
+} from '@kacean/ui'
 
 interface SectionFormData {
   platformName: string

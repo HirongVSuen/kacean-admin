@@ -2,10 +2,10 @@ import { computed, defineComponent, nextTick, onBeforeUnmount, onMounted, reacti
 import { Alert, Button, Form, FormItem, MessagePlugin } from 'tdesign-vue-next'
 import type { FormInstanceFunctions, FormRules, PageInfo, PrimaryTableCol } from 'tdesign-vue-next'
 import { HTTP_ABORTED_ERROR_CODE, HttpError } from '@kacean/common'
-import { AppDialog, ConfirmDialog, FormInput, PaginatedTable } from '@kacean/shared'
+import { AppDialog, ConfirmDialog, FormInput, PaginatedTable } from '@kacean/ui'
 import { createDataDictValueApi } from '../api/dataDictValue'
 import type { DataDictValuePayload, DataDictValueRecord } from '../api/dataDictValue'
-import { useServiceClient } from '../api/http'
+import { http } from '../index'
 
 interface DictValueFormData {
   dictCode: string
@@ -32,7 +32,7 @@ export default defineComponent({
     dictName: { type: String, default: '' }
   },
   setup(props) {
-    const api = createDataDictValueApi(useServiceClient('two-ticket'))
+    const api = createDataDictValueApi(http())
     /** 仅保存当前字典的值；后端 Query 不支持 dictId 条件，加载后按 dictId 过滤。 */
     const rows = ref<DataDictValueRecord[]>([])
     const keyword = ref('')

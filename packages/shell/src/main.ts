@@ -6,16 +6,18 @@ import './styles/theme.css'
 import 'virtual:uno.css'
 import { HTTP_CLIENT_FACTORY_KEY } from '@kacean/common'
 import App from './App'
+import { appConfig } from './config'
 import { shellReady } from './kernel'
 import { httpClientFactory } from './providers/http'
 import { createShellRouter } from './router'
 
 async function bootstrap() {
+  document.title = appConfig.title
   // 等待模块注册与菜单初始化完成，再创建路由、挂载应用
   await shellReady
   createApp(App)
     .use(createShellRouter())
-    // 统一注入 HttpClient 工厂：模块按逻辑服务 key 创建 client，鉴权空实现见 providers/http.ts
+    // 统一注入 HttpClient 工厂：按模块 ID 解析部署覆盖，鉴权空实现见 providers/http.ts
     .provide(HTTP_CLIENT_FACTORY_KEY, httpClientFactory)
     .mount('#app')
 }

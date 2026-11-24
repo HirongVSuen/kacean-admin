@@ -1,5 +1,5 @@
 import { createHttpClientFactory, type HttpAuthProvider } from '@kacean/common'
-import { serviceBaseURLs } from '../services.config'
+import { httpConfig } from '../config'
 
 /**
  * 统一鉴权空实现：token 存取、刷新与 401 行为待确认后补充。
@@ -19,10 +19,12 @@ export function createEmptyHttpAuthProvider(): HttpAuthProvider {
 }
 
 /**
- * shell 统一配置的 HttpClient 工厂：鉴权与服务目录在此收敛。
- * 模块通过 createForService(service) 按逻辑服务 key 创建 client，baseURL 来自 services.config.ts。
+ * shell 统一配置的 HttpClient 工厂：鉴权、全局地址与公共请求能力在此收敛。
+ * 模块部署覆盖由 @kacean/module 合并，随后复用本工厂的全局地址回退。
  */
 export const httpClientFactory = createHttpClientFactory({
   auth: createEmptyHttpAuthProvider(),
-  services: serviceBaseURLs
+  origin: httpConfig.origin,
+  basePath: httpConfig.basePath,
+  timeout: httpConfig.timeout
 })

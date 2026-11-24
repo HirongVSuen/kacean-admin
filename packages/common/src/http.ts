@@ -78,8 +78,22 @@ export interface HttpClientConfig {
   fetcher?: typeof fetch
 }
 
-/** 可覆盖的 client 配置（baseURL 由工厂 create 时单独传入） */
+/** 可覆盖的 client 公共配置（地址由 create / createForPath 解析） */
 export type HttpClientOverrides = Partial<Omit<HttpClientConfig, 'baseURL'>>
+
+/** 可分层继承与覆盖的接口地址；空字符串分别表示同源、无公共路径前缀。 */
+export interface HttpAddress {
+  /** 协议 + 域名/IP + 端口，如 https://example.com:8080；缺省继承全局 origin */
+  origin?: string
+  /** 全局 API 公共路径，如 /api；缺省继承全局 basePath */
+  basePath?: string
+}
+
+/** 分段地址 client 选项；模块默认值与部署覆盖由 @kacean/module 在调用前解析。 */
+export interface HttpEndpointClientOptions extends HttpClientOverrides, HttpAddress {
+  /** 已解析的服务路径，如 /two-ticket；空字符串表示根服务 */
+  servicePath: string
+}
 
 export interface HttpDataRequestOptions extends HttpRequestOptions {
   /**
@@ -109,29 +123,24 @@ export interface HttpClient {
   patch<T>(path: string, body?: unknown, options?: HttpDataRequestOptions): Promise<T | null>
 }
 
-/** 工厂配置：client 公共配置 + 逻辑服务目录 */
-export interface HttpClientFactoryOptions extends HttpClientOverrides {
-  /**
-   * 逻辑服务目录：service key -> baseURL，由 shell / 宿主按部署环境统一配置。
-   * 模块只声明服务 key，不硬编码 baseURL；同一 key 可跨模块共享（复用同一份地址配置）。
-   */
-  services?: Record<string, string>
-}
+/** 工厂配置：client 公共配置与全局接口地址，不理解具体业务模块。 */
+export type HttpClientFactoryOptions = HttpClientOverrides & HttpAddress
 
 /**
  * HttpClient 工厂：鉴权等公共配置由工厂统一注入。
- * - createForService(service)：按逻辑服务 key 创建 client，baseURL 来自服务目录（模块的首选方式）；
+ * - createForPath(options)：按已解析的分段地址创建，供模块接入层与宿主自身能力复用；
  * - create(baseURL)：按地址字面量创建，仅用于临时完整地址等场景。
- * shell 通过 HTTP_CLIENT_FACTORY_KEY provide 统一配置的工厂，
- * 模块以 inject(HTTP_CLIENT_FACTORY_KEY, undefined) 获取，未注入时按模块内开发默认目录降级。
+ * origin/basePath 缺省时继承工厂全局配置，再拼接调用方提供的 servicePath。
+ * 全局缺省 origin=''（同源）、basePath='/api'；空字符串覆盖不会被缺省值吞掉。
+ * shell 通过 HTTP_CLIENT_FACTORY_KEY provide 统一配置的工厂；未注入时使用默认匿名工厂。
  */
 export interface HttpClientFactory {
   create(baseURL: string, overrides?: HttpClientOverrides): HttpClient
-  /** 服务 key 未在服务目录中配置时抛错，并列出已配置的服务 key */
-  createForService(service: string, overrides?: HttpClientOverrides): HttpClient
+  /** 模块接入层与 shell 菜单等宿主请求使用；显式 origin/basePath 优先于全局地址 */
+  createForPath(options: HttpEndpointClientOptions): HttpClient
 }
 
-/** HttpClient 工厂注入 key（可选注入契约，与 PANEL_CONTROLLER_KEY 同模式，不属于内核 Provider） */
+/** HttpClient 工厂注入 key（可选注入契约，与 @kacean/ui 的 PANEL_CONTROLLER_KEY 同模式，不属于内核 Provider） */
 export const HTTP_CLIENT_FACTORY_KEY: InjectionKey<HttpClientFactory> = Symbol('kacean.http-client-factory')
 
 const DEFAULT_TIMEOUT = 30_000
@@ -148,6 +157,15 @@ function buildQuery(params?: Record<string, HttpQueryValue>): string {
     }
   }
   return search.toString()
+}
+
+/** 分段拼接接口地址，统一清理边界斜杠，避免覆盖 basePath 时丢失或重复路径。 */
+function resolveEndpointBaseURL(origin: string, basePath: string, servicePath: string): string {
+  const path = [basePath, servicePath]
+    .map((part) => part.trim().replace(/^\/+|\/+$/g, ''))
+    .filter(Boolean)
+    .join('/')
+  return `${origin.trim().replace(/\/+$/, '')}${path ? `/${path}` : ''}`
 }
 
 function resolveUrl(baseURL: string, path: string, params?: Record<string, HttpQueryValue>): string {
@@ -294,27 +312,24 @@ export function createHttpClient(config: HttpClientConfig): HttpClient {
   }
 }
 
-/** 创建统一配置的工厂：shell/宿主在此注入鉴权与服务目录，模块只关心服务 key */
+/** 创建统一配置的工厂：shell/宿主在此注入鉴权与全局接口地址。 */
 export function createHttpClientFactory(defaults: HttpClientFactoryOptions = {}): HttpClientFactory {
-  const { services = {}, ...clientDefaults } = defaults
+  const { origin: globalOrigin = '', basePath: globalBasePath = '/api', ...clientDefaults } = defaults
+
+  const createPathClient = (options: HttpEndpointClientOptions): HttpClient => {
+    const { servicePath, origin: localOrigin, basePath: localBasePath, ...overrides } = options
+    if (typeof servicePath !== 'string') {
+      throw new Error('[http] 地址定义缺少 servicePath。')
+    }
+    const baseURL = resolveEndpointBaseURL(localOrigin ?? globalOrigin, localBasePath ?? globalBasePath, servicePath)
+    return createHttpClient({ ...clientDefaults, ...overrides, baseURL })
+  }
+
   return {
     create: (baseURL, overrides) => createHttpClient({ ...clientDefaults, ...overrides, baseURL }),
-    createForService: (service, overrides) => {
-      const baseURL = services[service]
-      if (baseURL === undefined) {
-        const available = Object.keys(services)
-        throw new Error(
-          `[http] 服务 "${service}" 未配置 baseURL，请在 shell 服务目录（src/services.config.ts）登记。` +
-            (available.length > 0 ? `已配置服务：${available.join(', ')}` : '当前服务目录为空。')
-        )
-      }
-      return createHttpClient({ ...clientDefaults, ...overrides, baseURL })
-    }
+    createForPath: (options) => createPathClient(options)
   }
 }
 
-/**
- * 默认匿名工厂：服务目录为空，仅支持 create(baseURL) 字面量方式。
- * 模块独立开发需要 createForService 时，应自行创建带开发默认目录的工厂（见 kacean-module-http Skill）。
- */
+/** 默认匿名工厂：使用同源 origin 与 /api 公共前缀，调用方仍必须提供已解析的 servicePath。 */
 export const defaultHttpClientFactory: HttpClientFactory = createHttpClientFactory()

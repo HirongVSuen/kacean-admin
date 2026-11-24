@@ -3,20 +3,21 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
+  "kacean": {
+    "modes": [
+      "demo"
+    ]
+  },
   "exports": {
-    ".": "./src/index.ts",
-    "./manifest": "./src/manifest.ts"
+    ".": "./src/index.ts"
   },
   "scripts": {
-    "dev": "vite",
-    "build": "vite build && node scripts/emit-remote-meta.mjs",
-    "build:static": "vite build --mode static && node scripts/emit-remote-meta.mjs",
-    "preview": "vite preview",
     "typecheck": "vue-tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
     "@kacean/common": "workspace:*",
-    "@kacean/shared": "workspace:*",
+    "@kacean/module": "workspace:*",
+    "@kacean/ui": "workspace:*",
     "@kacean/types": "workspace:*",
     "tdesign-vue-next": "^1.20.11",
     "vue": "^3.5.13"

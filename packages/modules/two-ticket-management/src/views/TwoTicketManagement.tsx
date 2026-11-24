@@ -1,7 +1,7 @@
 import { computed, defineComponent, ref } from 'vue'
 import { Button, Tag } from 'tdesign-vue-next'
 import type { PageInfo, PrimaryTableCol } from 'tdesign-vue-next'
-import { DataTableTemplate, FormInput, FormSelect } from '@kacean/shared'
+import { DataTableTemplate, FormInput, FormSelect } from '@kacean/ui'
 import { ticketRows } from '../data/tickets'
 import type { TicketRecord, TicketStatus, TicketType } from '../data/tickets'
 

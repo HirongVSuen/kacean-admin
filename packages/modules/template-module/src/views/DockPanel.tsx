@@ -1,6 +1,6 @@
 import { defineComponent, ref } from 'vue'
 import { Button, Descriptions, MessagePlugin, Tag } from 'tdesign-vue-next'
-import { PageContainer, SectionCard, SidePanel } from '@kacean/shared'
+import { PageContainer, SectionCard, SidePanel } from '@kacean/ui'
 
 const project = {
   name: '园区能源管理二期',

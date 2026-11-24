@@ -4,7 +4,7 @@ export interface StaticModuleLoaderOptions {
   /** 构建期静态引入的模块实现（显式 import，按需打包、天然 tree-shake） */
   modules: AdminModuleManifest[]
   /**
-   * 静态清单配置（通常来自本地 json）：决定启停、注册顺序，预留 entry/integrity 等远程元数据。
+   * 清单描述（本地 json 可在调用前合并运行时覆盖）：决定启停、注册顺序，预留远程元数据。
    * 缺省时从 modules 派生（全部启用、按声明顺序注册）。
    * 显式提供时，已静态引入但未登记的模块会报错，防止漏配静默丢失。
    */
@@ -13,7 +13,7 @@ export interface StaticModuleLoaderOptions {
 
 /**
  * StaticLoader：前期按需模式的清单加载器。
- * 清单来源是构建期确定的本地配置；后期 SaaS 模式以 HttpLoader 替换本 loader，
+ * 静态实现搭配调用前确定的清单描述；后期 SaaS 模式以 HttpLoader 替换本 loader，
  * 内核 loadModules 的注册编排逻辑不变。
  */
 export function createStaticModuleLoader(options: StaticModuleLoaderOptions): ModuleLoader {

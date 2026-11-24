@@ -1,6 +1,6 @@
 # 模板页共享组件参考
 
-所有组件统一从 `@kacean/shared` 导入。公共包直接导出 TS/Vue 源码，由消费方 Vite 编译，不为公共包单独执行构建。
+所有组件统一从 `@kacean/ui` 导入。公共包直接导出 TS/Vue 源码，由消费方 Vite 编译，不为公共包单独执行构建。
 
 ## 组件选择
 
@@ -87,7 +87,7 @@ const handlePageChange = (pageInfo: PageInfo) => {
 />
 ```
 
-`ProjectSearch` 仅表示使用方自己的筛选组件，不属于共享组件 API。模板页 `/template-module/table-pagination` 提供完整静态交互示例，使用本地 mock 过滤和切片，始终向模板传入当前页数据；shell 的 `integration` 模式不加载该模板模块。
+`ProjectSearch` 仅表示使用方自己的筛选组件，不属于共享组件 API。模板页 `/template-module/table-pagination` 提供完整静态交互示例，使用本地 mock 过滤和切片，始终向模板传入当前页数据；shell 的 dev / prod 模式不加载该模板模块（仅 demo 样例模式挂载）。
 
 列定义使用 TDesign `PrimaryTableCol`。当前版本自定义单元格签名为 `cell: (_h, { row }) => ...`，先把 `row` 显式转换为本地记录类型，再读取字段。选择列的 `type: 'multiple'` 必要时使用 `as const` 保持字面量类型。
 
@@ -161,13 +161,13 @@ const visible = ref(false)
 ## 右侧面板
 
 - `SidePanel` 是受控组件：`visible` 控制显隐，`v-model:collapsed` 控制收缩；`showClose`、`showCollapse` 分别控制关闭与收缩按钮是否显示，默认均显示；`mode="dock"` 需放在 flex 行容器内（占位推挤，收缩为 40px 把手条），`mode="overlay"` 为 fixed 抽屉（滑入滑出过渡 + 遮罩淡入淡出），页面内降级优先用 overlay；`mask={false}` 时不渲染遮罩，面板外区域保持可交互；`closeOnEsc`、`closeOnOverlayClick` 可分别控制 Esc 与点遮罩关闭。dock 推挤布局的页面级演示见 template-module `DockPanel` 页（`/template-module/dock-panel`）：flex 行容器 + 主内容 `flex: 1; min-width: 0` + `SidePanel mode="dock"`。
-- 壳层全局面板通过可选注入使用：`const panel = inject(PANEL_CONTROLLER_KEY, undefined)`（key 来自 `@kacean/common`，`PanelController` 类型在 `@kacean/types`）。有注入时 `panel.open({ title, component, props })`，无注入时用本地 `SidePanel` 渲染同一内容组件，不得假定注入一定存在。
+- 壳层全局面板通过可选注入使用：`const panel = inject(PANEL_CONTROLLER_KEY, undefined)`（key 来自 `@kacean/ui`，`PanelController` 类型在 `@kacean/types`）。有注入时 `panel.open({ title, component, props })`，无注入时用本地 `SidePanel` 渲染同一内容组件，不得假定注入一定存在。
 - 全局面板宽度与收缩状态由壳层持久化，路由切换默认自动关闭（`closeOnRouteChange: false` 可覆盖）；参考 template-module `src/views/DetailLayout.tsx`。
 
 ## 新增公共组件检查
 
 1. 名称和 API 使用通用业务语义，不包含 template-module 专属术语。
 2. TDesign 包装组件若支持 attrs 透传，也必须暴露对应 TypeScript props 类型；运行时能传不代表 TSX 能通过。
-3. 在 `packages/shared-components/src/index.ts` 导出组件及需要消费的类型。
+3. 在 `packages/ui/src/index.ts` 导出组件及需要消费的类型。
 4. 公共样式统一使用 `kacean-` 前缀，写入 `src/styles/index.css`，颜色只引用 `--td-*`。
 5. 同步本参考和根文档，并执行所有消费方的类型检查与构建。

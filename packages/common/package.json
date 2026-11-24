@@ -9,6 +9,9 @@
   "dependencies": {
     "@kacean/types": "workspace:*"
   },
+  "peerDependencies": {
+    "vue": "^3.5.0"
+  },
   "devDependencies": {
     "vue": "^3.5.45"
   }

@@ -2,10 +2,10 @@ import { computed, defineComponent, nextTick, onBeforeUnmount, onMounted, reacti
 import { Alert, Button, Form, FormItem, MessagePlugin } from 'tdesign-vue-next'
 import type { FormInstanceFunctions, FormRules, PageInfo, PrimaryTableCol } from 'tdesign-vue-next'
 import { HTTP_ABORTED_ERROR_CODE, HttpError } from '@kacean/common'
-import { AppDialog, ConfirmDialog, DataTableTemplate, FormGrid, FormInput } from '@kacean/shared'
+import { AppDialog, ConfirmDialog, DataTableTemplate, FormGrid, FormInput } from '@kacean/ui'
 import { createTicketTypeApi } from '../api/ticketType'
 import type { TicketTypePayload, TicketTypeRecord } from '../api/ticketType'
-import { useServiceClient } from '../api/http'
+import { http } from '../index'
 
 interface TicketTypeFormData {
   ticketTypeName: string
@@ -38,7 +38,7 @@ function errorMessage(action: string, error: unknown) {
 export default defineComponent({
   name: 'TicketTypeManagement',
   setup() {
-    const api = createTicketTypeApi(useServiceClient('two-ticket'))
+    const api = createTicketTypeApi(http())
     const rows = ref<TicketTypeRecord[]>([])
     const current = ref(1)
     const pageSize = ref(10)

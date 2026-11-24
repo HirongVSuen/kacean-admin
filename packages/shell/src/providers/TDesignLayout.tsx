@@ -21,7 +21,7 @@ import {
 import type { DropdownOption } from 'tdesign-vue-next'
 import type { AdminUser, LayoutProvider, ModuleMenuItem } from '@kacean/types'
 import type { AdminKernel } from '@kacean/core'
-import { PANEL_CONTROLLER_KEY } from '@kacean/common'
+import { PANEL_CONTROLLER_KEY } from '@kacean/ui'
 import AppIcon from '../components/AppIcon'
 import { createGlobalPanel } from './globalPanel'
 import { useLayoutPreferences } from './useLayoutPreferences'

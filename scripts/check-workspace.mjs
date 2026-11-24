@@ -8,12 +8,15 @@ const errors = []
 const records = []
 
 const fixedPackages = [
-  { dir: 'packages/admin-module-types', name: '@kacean/types', kind: 'public' },
+  { dir: 'packages/types', name: '@kacean/types', kind: 'public' },
   { dir: 'packages/common', name: '@kacean/common', kind: 'public' },
+  { dir: 'packages/module', name: '@kacean/module', kind: 'public' },
   { dir: 'packages/core', name: '@kacean/core', kind: 'public' },
-  { dir: 'packages/shared-components', name: '@kacean/shared', kind: 'public' },
+  { dir: 'packages/ui', name: '@kacean/ui', kind: 'public' },
   { dir: 'packages/shell', name: 'shell', kind: 'shell' }
 ]
+
+const moduleModes = ['development', 'production', 'demo']
 
 const displayPath = (path) => relative(root, path).replaceAll('\\', '/')
 
@@ -45,13 +48,64 @@ function loadPackage(dir, expectedName, kind) {
     errors.push(`${dir} 必须以 ./src/index.ts 作为默认源码导出`)
   }
   if (kind === 'shell' || kind === 'module') {
-    for (const script of ['dev', 'build', 'typecheck']) {
+    const requiredScripts = kind === 'shell' ? ['dev', 'dev:module', 'build', 'typecheck'] : ['typecheck']
+    for (const script of requiredScripts) {
       if (!manifest.scripts?.[script]) errors.push(`${dir} 缺少 ${script} 脚本`)
     }
   }
   if (kind === 'module') {
-    for (const file of ['src/manifest.ts', 'src/dev/App.tsx']) {
-      if (!existsSync(join(absoluteDir, file))) errors.push(`${dir} 缺少 ${file}`)
+    if (!existsSync(join(absoluteDir, 'src/index.ts'))) {
+      errors.push(`${dir} 缺少 src/index.ts 模块定义入口`)
+    }
+    // 构建期以 shell 的 workspace 依赖为登记点，按 kacean.modes 聚合各模式候选集。
+    const modes = manifest.kacean?.modes
+    if (!Array.isArray(modes) || modes.length === 0 || modes.some((mode) => !moduleModes.includes(mode))) {
+      errors.push(`${dir}/package.json 必须声明 kacean.modes（非空数组，可选 ${moduleModes.join('/')}）`)
+    }
+    if (manifest.dependencies?.['@kacean/module'] !== 'workspace:*') {
+      errors.push(`${dir} 必须以 workspace:* 依赖 @kacean/module`)
+    }
+    const servicePath = manifest.kacean?.servicePath
+    const paths = typeof servicePath === 'string' ? { default: servicePath } : servicePath
+    if (paths !== undefined) {
+      if (typeof paths !== 'object' || paths === null || Array.isArray(paths)) {
+        errors.push(`${dir}/package.json 的 kacean.servicePath 必须是路径字符串或 key-value 对象`)
+      } else if (Object.keys(paths).length === 0) {
+        errors.push(`${dir}/package.json 的 kacean.servicePath 对象至少声明一个服务`)
+      } else {
+        for (const [key, path] of Object.entries(paths)) {
+          if (
+            !key.trim() ||
+            typeof path !== 'string' ||
+            !path.trim().startsWith('/') ||
+            path.includes('?') ||
+            path.includes('#')
+          ) {
+            errors.push(
+              `${dir}/package.json 的 kacean.servicePath.${key} 必须是非空、以 / 开头且不含 query/hash 的路径`
+            )
+          }
+        }
+      }
+    }
+    const http = manifest.kacean?.http
+    if (http !== undefined) {
+      if (typeof http !== 'object' || http === null || Array.isArray(http)) {
+        errors.push(`${dir}/package.json 的 kacean.http 必须是仅含 origin/basePath 的对象`)
+      } else {
+        const unsupported = Object.keys(http).filter((field) => !['origin', 'basePath'].includes(field))
+        if (unsupported.length > 0) {
+          errors.push(`${dir}/package.json 的 kacean.http 不支持：${unsupported.join('、')}`)
+        }
+        for (const field of ['origin', 'basePath']) {
+          if (http[field] !== undefined && typeof http[field] !== 'string') {
+            errors.push(`${dir}/package.json 的 kacean.http.${field} 必须是字符串`)
+          }
+        }
+        if (typeof http.basePath === 'string' && http.basePath && !http.basePath.startsWith('/')) {
+          errors.push(`${dir}/package.json 的 kacean.http.basePath 必须以 / 开头或为空字符串`)
+        }
+      }
     }
   }
 }
@@ -119,43 +173,6 @@ for (const record of records) {
 const typesPackage = packagesByName.get('@kacean/types')
 if (typesPackage && Object.keys(typesPackage.manifest.dependencies ?? {}).length > 0) {
   errors.push('@kacean/types 是纯类型包，不允许声明运行时 dependencies')
-}
-
-const shell = packagesByName.get('shell')
-const descriptorsPath = join(root, 'packages/shell/src/modules.config.json')
-const descriptors = existsSync(descriptorsPath) ? readJson(descriptorsPath) : undefined
-if (!Array.isArray(descriptors)) {
-  errors.push('packages/shell/src/modules.config.json 必须是模块描述数组')
-} else if (shell) {
-  const descriptorIds = new Set()
-  for (const descriptor of descriptors) {
-    const id = descriptor?.id
-    if (typeof id !== 'string' || !id) {
-      errors.push('modules.config.json 中每个 descriptor 必须包含非空 id')
-      continue
-    }
-    if (descriptorIds.has(id)) errors.push(`modules.config.json 中 descriptor 重复：${id}`)
-    descriptorIds.add(id)
-
-    const target = packagesByName.get(id)
-    if (!target || (target.kind !== 'module' && target.kind !== 'shell')) {
-      errors.push(`modules.config.json 引用了未知模块：${id}`)
-      continue
-    }
-    if (descriptor.version !== undefined && descriptor.version !== target.manifest.version) {
-      errors.push(`modules.config.json 中 ${id} 的版本与模块 package.json 不一致`)
-    }
-    if (target.kind === 'module' && shell.manifest.dependencies?.[id] !== 'workspace:*') {
-      errors.push(`shell 必须以 workspace:* 声明已登记模块 ${id}`)
-    }
-  }
-
-  for (const [name, version] of Object.entries(shell.manifest.dependencies ?? {})) {
-    const target = packagesByName.get(name)
-    if (target?.kind === 'module' && version === 'workspace:*' && !descriptorIds.has(name)) {
-      errors.push(`shell 已引入 ${name}，但 modules.config.json 未登记`)
-    }
-  }
 }
 
 if (errors.length > 0) {

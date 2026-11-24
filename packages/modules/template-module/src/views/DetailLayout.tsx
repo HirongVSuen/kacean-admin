@@ -1,8 +1,8 @@
 import { defineComponent, inject, ref } from 'vue'
 import { Button, Descriptions, MessagePlugin, Progress, Space, Tag, Timeline } from 'tdesign-vue-next'
-import { PANEL_CONTROLLER_KEY } from '@kacean/common'
-import type { DetailSummaryItem } from '@kacean/shared'
-import { DetailGrid, DetailSummary, PageContainer, SectionCard, SidePanel } from '@kacean/shared'
+import { PANEL_CONTROLLER_KEY } from '@kacean/ui'
+import type { DetailSummaryItem } from '@kacean/ui'
+import { DetailGrid, DetailSummary, PageContainer, SectionCard, SidePanel } from '@kacean/ui'
 
 const project = {
   name: '园区能源管理二期',
@@ -43,9 +43,8 @@ const ProjectPanelContent = defineComponent({
           <Descriptions.DescriptionsItem label="当前状态">{project.status}</Descriptions.DescriptionsItem>
         </Descriptions>
         <p class="text-secondary" style="margin: 16px 0 0; font-size: 12px; line-height: 1.8">
-          本面板由共享组件 SidePanel 渲染：独立平台下通过 PANEL_CONTROLLER_KEY
-          打开壳层全局面板（dock 推挤内容区，可收缩为把手条，窄屏自动变为抽屉）；模块独立开发或无注入的宿主中，
-          同一内容降级为页面内 overlay 面板。
+          本面板由共享组件 SidePanel 渲染：独立平台下通过 PANEL_CONTROLLER_KEY 打开壳层全局面板（dock
+          推挤内容区，可收缩为把手条，窄屏自动变为抽屉）；未注入面板控制器的宿主中， 同一内容降级为页面内 overlay 面板。
         </p>
       </>
     )
@@ -55,7 +54,7 @@ const ProjectPanelContent = defineComponent({
 export default defineComponent({
   name: 'TemplateDetailLayout',
   setup() {
-    // 可选注入：独立平台由 shell 提供；模块独立开发 / 无头宿主可能未提供，需本地降级。
+    // 可选注入：shell 与单模块开发模式均提供；无头宿主可能未提供，需本地降级。
     const panel = inject(PANEL_CONTROLLER_KEY, undefined)
     const localPanelVisible = ref(false)
     const localPanelCollapsed = ref(false)

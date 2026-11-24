@@ -15,7 +15,7 @@ import {
   Textarea
 } from 'tdesign-vue-next'
 import type { FormInstanceFunctions, FormRules } from 'tdesign-vue-next'
-import { FormActions, FormGrid, PageContainer, SectionCard, StepFormLayout } from '@kacean/shared'
+import { FormActions, FormGrid, PageContainer, SectionCard, StepFormLayout } from '@kacean/ui'
 
 interface StepFormData {
   name: string

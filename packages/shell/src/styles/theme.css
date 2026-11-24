@@ -1,8 +1,8 @@
 /**
  * shell 主题定制入口：集中覆盖 TDesign token（--td-*）。
  * - 独立平台：在此覆盖变量定制品牌主题，在 TDesign 样式之后引入保证优先级。
- * - 无头嵌入（WC / UMD）：由宿主在自身样式表覆盖同名变量，CSS 自定义属性沿 DOM 继承，
- *   UMD 普通挂载直接生效；WC + Shadow DOM 下变量可穿透继承，但模块样式表需注入 shadow root。
+ * - 无头嵌入（含 WC）：由宿主在自身样式表覆盖同名变量，CSS 自定义属性沿 DOM 继承，
+ *   普通挂载直接生效；WC + Shadow DOM 下变量可穿透继承，但模块样式表需注入 shadow root。
  * - 暗色模式：TDesign 通过 theme-mode 属性切换，宿主暗色切换时同步设置挂载容器的 theme-mode。
  * - 品牌主题：独立平台通过 data-brand-theme 切换 default / energy-blue / sgcc-green / vibrant-orange。
  * 业务模块只允许引用 --td-* 变量，不得在此覆盖以外的位置定制主题。

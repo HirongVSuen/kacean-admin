@@ -10,7 +10,7 @@ import {
   FormTextarea,
   PageContainer,
   SectionCard
-} from '@kacean/shared'
+} from '@kacean/ui'
 
 interface DialogFormData {
   name: string

@@ -83,7 +83,7 @@ export default defineComponent({
     const demoMessage = computed(() => (isSuccessResponse(res) ? res.data : res.message))
 
     const navigate = (path: string) => {
-      // 集成模式使用宿主安装的 Vue Router；独立开发壳通过 navigate 事件切换页面。
+      // 优先使用宿主安装的 Vue Router；无头宿主未安装 Router 时通过 navigate 事件自行处理。
       const globalProperties = instance?.appContext.config.globalProperties as Record<string, unknown> | undefined
       const router = globalProperties?.$router as { push: (target: string) => unknown } | undefined
       if (router) {
@@ -120,7 +120,7 @@ export default defineComponent({
     const capabilityItems = computed(() => [
       { title: '公共包链路', description: demoMessage.value },
       { title: '界面技术栈', description: 'TSX + TDesign + UnoCSS' },
-      { title: '模块构建产物', description: 'ESM + UMD 双产物' }
+      { title: '模块构建产物', description: 'ESM 模块产物' }
     ])
 
     return () => (

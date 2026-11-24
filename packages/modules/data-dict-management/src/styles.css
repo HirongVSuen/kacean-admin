@@ -66,38 +66,6 @@
   font-weight: 500;
 }
 
-.data-dict-management-dev {
-  display: flex;
-  height: 100dvh;
-  min-height: 0;
-  box-sizing: border-box;
-  flex-direction: column;
-  padding: 24px;
-  overflow: hidden;
-  background: var(--td-bg-color-page);
-}
-
-.data-dict-management-dev__header {
-  flex: none;
-  margin-bottom: 20px;
-}
-
-.data-dict-management-dev__header h1 {
-  margin: 0 0 8px;
-  color: var(--td-text-color-primary);
-  font-size: 22px;
-}
-
-.data-dict-management-dev__header p {
-  margin: 0;
-  color: var(--td-text-color-secondary);
-}
-
-.data-dict-management-dev__content {
-  flex: 1;
-  min-height: 0;
-}
-
 @media (max-width: 760px) {
   .data-dict-management__search,
   .data-dict-values__toolbar {
@@ -106,9 +74,5 @@
 
   .data-dict-management__search-actions {
     flex-wrap: wrap;
-  }
-
-  .data-dict-management-dev {
-    padding: 18px;
   }
 }

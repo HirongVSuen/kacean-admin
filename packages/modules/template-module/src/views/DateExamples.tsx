@@ -10,7 +10,7 @@ import {
   FormGrid,
   PageContainer,
   SectionCard
-} from '@kacean/shared'
+} from '@kacean/ui'
 
 interface DateExampleData {
   singleDate: DateValue
@@ -69,11 +69,7 @@ export default defineComponent({
           <Form data={formData} labelWidth={90}>
             <FormGrid>
               <FormItem label="单个日期" name="singleDate">
-                <FormDatePicker
-                  v-model={formData.singleDate}
-                  placeholder="请选择日期"
-                  valueType="YYYY-MM-DD"
-                />
+                <FormDatePicker v-model={formData.singleDate} placeholder="请选择日期" valueType="YYYY-MM-DD" />
               </FormItem>
               <FormItem label="日期范围" name="rangeDate">
                 <FormDateRangePicker

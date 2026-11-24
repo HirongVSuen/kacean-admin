@@ -1,6 +1,6 @@
 import { defineComponent, ref } from 'vue'
 import type { PageInfo } from 'tdesign-vue-next'
-import { PageContainer, PaginationBar, SectionCard } from '@kacean/shared'
+import { PageContainer, PaginationBar, SectionCard } from '@kacean/ui'
 
 export default defineComponent({
   name: 'TemplatePaginationExamples',

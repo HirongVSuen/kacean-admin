@@ -21,38 +21,6 @@
   margin-top: 12px;
 }
 
-.account-management-dev {
-  display: flex;
-  height: 100dvh;
-  min-height: 0;
-  box-sizing: border-box;
-  flex-direction: column;
-  padding: 24px;
-  overflow: hidden;
-  background: var(--td-bg-color-page);
-}
-
-.account-management-dev__header {
-  flex: none;
-  margin-bottom: 20px;
-}
-
-.account-management-dev__header h1 {
-  margin: 0 0 8px;
-  color: var(--td-text-color-primary);
-  font-size: 22px;
-}
-
-.account-management-dev__header p {
-  margin: 0;
-  color: var(--td-text-color-secondary);
-}
-
-.account-management-dev__content {
-  flex: 1;
-  min-height: 0;
-}
-
 @media (max-width: 760px) {
   .account-management__search {
     grid-template-columns: minmax(0, 1fr);
@@ -60,9 +28,5 @@
 
   .account-management__search-actions {
     flex-wrap: wrap;
-  }
-
-  .account-management-dev {
-    padding: 18px;
   }
 }

@@ -1,7 +1,7 @@
 import { computed, defineComponent, ref } from 'vue'
 import { Tag } from 'tdesign-vue-next'
 import type { TreeNodeModel, TreeNodeValue, TreeOptionData } from 'tdesign-vue-next'
-import { AppTree, FormInput, PageContainer, SectionCard } from '@kacean/shared'
+import { AppTree, FormInput, PageContainer, SectionCard } from '@kacean/ui'
 import { organizationTree, serviceCatalogChildren, serviceCatalogTree } from '../data/organization'
 
 /** 收集节点 value 与 label 的映射，用于展示激活与勾选结果。 */
@@ -34,9 +34,7 @@ export default defineComponent({
     })
 
     const checked = ref<TreeNodeValue[]>(['product-frontend', 'product-backend'])
-    const checkedLabels = computed(() =>
-      checked.value.map((value) => labelMap.get(String(value)) ?? String(value))
-    )
+    const checkedLabels = computed(() => checked.value.map((value) => labelMap.get(String(value)) ?? String(value)))
 
     /** 模拟异步加载子节点，仅返回本地静态数据，不发起真实请求。 */
     const loadCatalogChildren = (node: TreeNodeModel<TreeOptionData>) =>

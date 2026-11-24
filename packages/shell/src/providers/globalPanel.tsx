@@ -1,7 +1,7 @@
 import { defineComponent, h, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import type { Component } from 'vue'
 import type { PanelController, PanelOpenOptions } from '@kacean/types'
-import { SidePanel } from '@kacean/shared'
+import { SidePanel } from '@kacean/ui'
 
 interface GlobalPanelState {
   visible: boolean
@@ -48,7 +48,7 @@ function readPanelPreferences(): PanelPreferences {
 /**
  * shell 全局右侧面板：状态 + 控制器 + 宿主组件。
  * 控制器通过 PANEL_CONTROLLER_KEY 注入给业务模块（在 TDesignLayout 中 provide），
- * 宿主组件复用 @kacean/shared 的 SidePanel，与模块本地面板同一实现。
+ * 宿主组件复用 @kacean/ui 的 SidePanel，与模块本地面板同一实现。
  */
 export function createGlobalPanel() {
   const persisted = readPanelPreferences()
